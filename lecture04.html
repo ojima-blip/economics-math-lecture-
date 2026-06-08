@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>経済数学入門B 第4回｜２次関数と独占</title>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+  options: { skipHtmlTags: ['script','noscript','style','textarea'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<style>
+:root {
+  --primary:#1e40af; --primary-l:#3b82f6; --primary-bg:#eff6ff;
+  --green:#15803d; --green-bg:#f0fdf4;
+  --red:#dc2626; --red-bg:#fef2f2;
+  --purple:#7c3aed;
+  --bg:#f1f5f9; --card:#fff; --text:#1e293b; --muted:#64748b; --border:#e2e8f0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+
+/* Back nav */
+.back-bar{background:#1a1a2e;padding:.55rem 1.5rem;display:flex;align-items:center;gap:1rem}
+.back-link{color:rgba(247,243,238,.7);font-family:'Space Mono',monospace;font-size:.75rem;letter-spacing:.06em;text-decoration:none;display:flex;align-items:center;gap:.4rem;transition:color .15s}
+.back-link:hover{color:#c0392b}
+.back-link::before{content:'←'}
+.back-course{color:rgba(247,243,238,.35);font-family:'Space Mono',monospace;font-size:.72rem;letter-spacing:.08em}
+
+/* Header */
+.site-header{background:linear-gradient(135deg,#1e3a5f 0%,#1e40af 100%);color:#fff;padding:2.2rem 1.5rem 1.8rem;text-align:center}
+.site-header .course{font-size:.8rem;letter-spacing:.12em;opacity:.75;text-transform:uppercase;margin-bottom:.3rem;font-family:monospace}
+.site-header h1{font-size:clamp(1.2rem,3vw,1.85rem);font-weight:700;margin-bottom:.4rem}
+.site-header .subtitle{font-size:.9rem;opacity:.7}
+/* Nav */
+.main-nav{position:sticky;top:0;z-index:100;background:#fff;border-bottom:2px solid var(--border);display:flex;overflow-x:auto;gap:0}
+.nav-btn{flex:0 0 auto;padding:.65rem 1rem;font-size:.83rem;font-weight:600;border:none;background:none;cursor:pointer;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;white-space:nowrap}
+.nav-btn:hover{color:var(--primary);background:var(--primary-bg)}
+.nav-btn.active{color:var(--primary);border-bottom-color:var(--primary)}
+/* Layout */
+.section{display:none;padding:2rem 1.2rem;max-width:900px;margin:0 auto}
+.section.active{display:block}
+.section-title{font-size:1.35rem;font-weight:700;color:var(--primary);margin-bottom:.3rem;display:flex;align-items:center;gap:.5rem}
+.section-title .badge{font-size:.75rem;background:var(--primary);color:#fff;padding:.2rem .6rem;border-radius:999px}
+.section-desc{color:var(--muted);margin-bottom:1.5rem;font-size:.93rem}
+/* Cards */
+.card{background:var(--card);border-radius:12px;padding:1.4rem;margin-bottom:1.2rem;box-shadow:0 1px 4px rgba(0,0,0,.07),0 4px 12px rgba(0,0,0,.04)}
+.card-title{font-size:1rem;font-weight:700;margin-bottom:.8rem;color:var(--text)}
+/* Definition box */
+.def-box{border-left:4px solid var(--primary);background:var(--primary-bg);border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin:1rem 0}
+.def-box .def-label{font-size:.75rem;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem}
+.def-box p{font-size:.95rem}
+/* Two-column */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+@media(max-width:680px){.two-col{grid-template-columns:1fr}}
+/* Steps */
+.step-container{margin:1rem 0}
+.step{display:none;animation:fadeIn .3s ease}
+.step.visible{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.step-box{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:.9rem 1.1rem;margin:.5rem 0}
+.step-box .step-num{font-size:.75rem;font-weight:700;color:var(--primary);margin-bottom:.3rem}
+.step-btn{display:inline-flex;align-items:center;gap:.4rem;background:var(--primary);color:#fff;border:none;border-radius:8px;padding:.55rem 1.1rem;font-size:.88rem;font-weight:600;cursor:pointer;transition:background .2s}
+.step-btn:hover{background:#1d4ed8}
+.step-btn:disabled{background:#94a3b8;cursor:not-allowed}
+.reset-btn{background:var(--muted)}
+.reset-btn:hover{background:#475569}
+/* Sliders */
+.control-group{margin:.8rem 0}
+.control-label{font-size:.85rem;font-weight:600;margin-bottom:.3rem;display:flex;justify-content:space-between}
+.control-label span{color:var(--primary);font-weight:700}
+input[type=range]{width:100%;accent-color:var(--primary);cursor:pointer}
+/* Canvas */
+.graph-wrap{position:relative;background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+canvas{display:block;max-width:100%;height:auto}
+.graph-legend{display:flex;flex-wrap:wrap;gap:.6rem;padding:.6rem .8rem;border-top:1px solid var(--border);font-size:.78rem}
+.legend-item{display:flex;align-items:center;gap:.35rem}
+.legend-dot{width:12px;height:12px;border-radius:3px}
+/* Quiz */
+.quiz-box{background:linear-gradient(135deg,#f8fafc,#f1f5f9);border:1px solid var(--border);border-radius:12px;padding:1.4rem;margin-top:1.5rem}
+.quiz-box .quiz-title{font-size:.9rem;font-weight:700;color:var(--purple);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.quiz-q{margin-bottom:1.2rem}
+.quiz-q .q-text{font-size:.93rem;font-weight:600;margin-bottom:.7rem}
+.quiz-options{display:flex;flex-direction:column;gap:.4rem}
+.opt-btn{background:#fff;border:1px solid var(--border);border-radius:8px;padding:.6rem 1rem;font-size:.88rem;text-align:left;cursor:pointer;transition:all .2s}
+.opt-btn:hover{border-color:var(--primary-l);background:var(--primary-bg)}
+.opt-btn.correct{background:#f0fdf4;border-color:var(--green);color:var(--green)}
+.opt-btn.wrong{background:var(--red-bg);border-color:var(--red);color:var(--red)}
+.quiz-feedback{margin-top:.6rem;font-size:.85rem;padding:.5rem .8rem;border-radius:6px;display:none}
+.quiz-feedback.show{display:block}
+.quiz-feedback.ok{background:var(--green-bg);color:var(--green);border-left:3px solid var(--green)}
+.quiz-feedback.ng{background:var(--red-bg);color:var(--red);border-left:3px solid var(--red)}
+/* Result */
+.result-panel{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:1rem;margin-top:.8rem}
+.result-panel .result-row{display:flex;justify-content:space-between;align-items:center;padding:.3rem 0;border-bottom:1px solid var(--border);font-size:.9rem}
+.result-panel .result-row:last-child{border-bottom:none;font-weight:700}
+.result-panel .result-val{color:var(--primary);font-weight:700}
+.hl{background:rgba(59,130,246,.15);padding:.1em .2em;border-radius:3px}
+/* Summary */
+.summary-item{display:flex;gap:.8rem;padding:.8rem 0;border-bottom:1px solid var(--border)}
+.summary-item:last-child{border-bottom:none}
+.summary-num{width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;font-size:.8rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem}
+/* Inner tabs */
+.tab-row{display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap}
+.tab-btn{padding:.45rem .9rem;border-radius:999px;border:1.5px solid var(--border);background:#fff;font-size:.83rem;font-weight:600;cursor:pointer;color:var(--muted);transition:all .2s}
+.tab-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.info-box{background:linear-gradient(135deg,#fef9c3,#fef3c7);border:1px solid #fbbf24;border-radius:8px;padding:.8rem 1rem;margin:.8rem 0;font-size:.88rem}
+.info-box::before{content:"💡 "}
+</style>
+</head>
+<body>
+
+<!-- 目次へ戻るバー -->
+<div class="back-bar">
+  <a class="back-link" href="index.html">目次に戻る</a>
+  <span class="back-course">経済数学入門B</span>
+</div>
+
+<header class="site-header">
+  <div class="course">Lecture 04</div>
+  <h1>第4回：２次関数と独占</h1>
+  <div class="subtitle">費用の最小化・利潤の最大化</div>
+</header>
+
+<nav class="main-nav">
+  <button class="nav-btn active" onclick="showSection('s1',this)">① 独占と利潤</button>
+  <button class="nav-btn" onclick="showSection('s2',this)">② ２次関数の最大値・最小値</button>
+  <button class="nav-btn" onclick="showSection('s3',this)">③ 平方完成</button>
+  <button class="nav-btn" onclick="showSection('s4',this)">④ 練習問題：価格設定</button>
+  <button class="nav-btn" onclick="showSection('s5',this)">⑤ まとめ</button>
+</nav>
+
+<!-- ===== SECTION 1: 独占と利潤 ===== -->
+<section id="s1" class="section active">
+  <div class="section-title"><span class="badge">Section 1</span>独占と利潤</div>
+  <p class="section-desc">需要関数が１次関数のとき、独占企業の利潤がなぜ２次関数になるのかを学びます。</p>
+
+  <div class="card">
+    <div class="card-title">📖 問題設定：井戸水の独占販売</div>
+    <p style="margin-bottom:.8rem">あなたは村で唯一の井戸を保有している。井戸水を１回汲んで販売するのに<strong>常に2の費用</strong>がかかり、<strong>固定費用は0</strong>であるとする。</p>
+    <div class="def-box">
+      <div class="def-label">需要関数</div>
+      <p>$$D(p) = 8 - p$$</p>
+      <p style="margin-top:.4rem">いくらでいくつ販売すると<strong>利潤</strong>（総収入 − 総費用）が最大化されるだろうか？</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🎛 利潤を最大化する生産量を探そう</div>
+    <p style="font-size:.88rem;color:var(--muted);margin-bottom:.8rem">逆需要関数は $P(q) = 8-q$ なので、価格は $p=8-q$ で決まります。生産量 $q$ を動かして、利潤がどう変化するか観察しましょう。</p>
+    <div class="two-col">
+      <div>
+        <div class="control-group">
+          <div class="control-label">生産量 q = <span id="q1-val">3</span></div>
+          <input type="range" id="q1-sl" min="0" max="6" value="3" step="1" oninput="updateMonopoly()">
+        </div>
+        <div class="result-panel">
+          <div class="result-row"><span>価格 $p = 8-q$</span><span class="result-val" id="m-p">5</span></div>
+          <div class="result-row"><span>総収入 $R = pq$</span><span class="result-val" id="m-r">15</span></div>
+          <div class="result-row"><span>総費用 $C = 2q$</span><span class="result-val" id="m-c">6</span></div>
+          <div class="result-row"><span><strong>利潤 $\pi = R-C$</strong></span><span class="result-val" id="m-pi">9</span></div>
+        </div>
+        <div class="info-box" id="m-hint">$q=3$ のとき利潤は最大値 9 をとります！</div>
+      </div>
+      <div>
+        <div class="graph-wrap">
+          <canvas id="m-canvas" width="360" height="300"></canvas>
+        </div>
+        <div class="graph-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#1e40af"></div>利潤 $\pi=6q-q^2$</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#7c3aed;border-radius:50%"></div>現在の点</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#dc2626;border-radius:50%"></div>最大点</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🧮 利潤関数を式で求める</div>
+    <p style="margin-bottom:.6rem;font-size:.93rem">逆需要関数 $P(q) = 8-q$ より、収入は</p>
+    <div class="step-box">
+      $$R = p \times q = (8-q)q = 8q - q^2$$
+    </div>
+    <p style="margin:.6rem 0;font-size:.93rem">１単位の生産に追加的な費用が 2 かかるため、費用は $C = 2q$。よって利潤は</p>
+    <div class="step-box" style="border-color:var(--primary);background:var(--primary-bg)">
+      $$\pi = R - C = (8q-q^2) - 2q = 6q - q^2$$
+    </div>
+    <p style="margin-top:.6rem;font-size:.93rem">利潤 $\pi$ が生産量 $q$ の関数になっていますが、今回は１次関数ではなく $q^2$ の項が登場しました。これが <strong>２次関数</strong> です。</p>
+    <div class="def-box">
+      <div class="def-label">定義：２次関数</div>
+      <p>説明変数の最大の次数が <strong>2</strong> である関数を２次関数という。一般に $y = ax^2+bx+c$ （$a\neq0$）の形で表される。</p>
+    </div>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-title">📝 確認問題</div>
+    <div class="quiz-q">
+      <div class="q-text">需要関数が $D(p)=10-p$、追加的な費用が常に 4 である独占企業の利潤関数 $\pi(q)$ はどれか？（逆需要関数は $P(q)=10-q$）</div>
+      <div class="quiz-options" id="q1-opts">
+        <button class="opt-btn" onclick="checkQ('q1',0,2,'収入 R=(10-q)q=10q-q^2、費用 C=4q なので π=10q-q^2-4q=6q-q^2 となります。')">① $\pi = 10q - q^2$</button>
+        <button class="opt-btn" onclick="checkQ('q1',1,2,'収入 R=(10-q)q=10q-q^2、費用 C=4q なので π=10q-q^2-4q=6q-q^2 となります。')">② $\pi = 6q - q^2$</button>
+        <button class="opt-btn" onclick="checkQ('q1',2,2,'収入 R=(10-q)q=10q-q^2、費用 C=4q なので π=10q-q^2-4q=6q-q^2 となります。')">③ $\pi = -4q - q^2$</button>
+        <button class="opt-btn" onclick="checkQ('q1',3,2,'収入 R=(10-q)q=10q-q^2、費用 C=4q なので π=10q-q^2-4q=6q-q^2 となります。')">④ $\pi = 14q - q^2$</button>
+      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 2: ２次関数の最大値・最小値 ===== -->
+<section id="s2" class="section">
+  <div class="section-title"><span class="badge">Section 2</span>２次関数の最大値・最小値</div>
+  <p class="section-desc">放物線の形と頂点の関係から、最大値・最小値の在り処を理解しましょう。</p>
+
+  <div class="two-col">
+    <div class="def-box">
+      <div class="def-label">$y=ax^2$ で $a>0$</div>
+      <p>原点を通る<strong>下に凸</strong>の谷型の放物線。<br>$x=0$ で<span class="hl">最小値</span> $y=0$ をとる。</p>
+    </div>
+    <div class="def-box" style="border-color:var(--red);background:var(--red-bg)">
+      <div class="def-label" style="color:var(--red)">$y=ax^2$ で $a<0$</div>
+      <p>原点を通る<strong>上に凸</strong>の山型の放物線。<br>$x=0$ で<span class="hl">最大値</span> $y=0$ をとる。</p>
+    </div>
+  </div>
+
+  <div class="def-box" style="border-color:var(--purple);background:#f5f3ff">
+    <div class="def-label" style="color:var(--purple)">平行移動した形</div>
+    <p>$$y = a(x-s)^2 + t$$</p>
+    <p style="margin-top:.4rem">放物線 $y=ax^2$ を $x$ 軸方向に $s$、$y$ 軸方向に $t$ だけ平行移動したもの。</p>
+    <ul style="padding-left:1.2rem;margin-top:.4rem;font-size:.92rem">
+      <li>$a>0$ ⇒ 下に凸、$x=s$ で<strong>最小値</strong> $y=t$</li>
+      <li>$a<0$ ⇒ 上に凸、$x=s$ で<strong>最大値</strong> $y=t$</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🎛 グラフをいじって頂点を観察しよう</div>
+    <div class="two-col">
+      <div>
+        <div class="control-group">
+          <div class="control-label">係数 a = <span id="a-val">1</span></div>
+          <input type="range" id="a-sl" min="-2" max="2" value="1" step="0.5" oninput="updateQuad()">
+        </div>
+        <div class="control-group">
+          <div class="control-label">平行移動 s = <span id="s-val">0</span></div>
+          <input type="range" id="s-sl" min="-4" max="4" value="0" step="1" oninput="updateQuad()">
+        </div>
+        <div class="control-group">
+          <div class="control-label">平行移動 t = <span id="t-val">0</span></div>
+          <input type="range" id="t-sl" min="-6" max="6" value="0" step="1" oninput="updateQuad()">
+        </div>
+        <div class="result-panel">
+          <div class="result-row"><span>関数の式</span><span class="result-val" id="quad-eq">$y = x^2$</span></div>
+          <div class="result-row"><span>頂点（凸の向き）</span><span class="result-val" id="quad-shape">下に凸</span></div>
+          <div class="result-row"><span><strong>最大値・最小値</strong></span><span class="result-val" id="quad-ext">$x=0$ で最小値 $y=0$</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="graph-wrap">
+          <canvas id="quad-canvas" width="360" height="320"></canvas>
+        </div>
+        <div class="graph-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#1e40af"></div>$y=a(x-s)^2+t$</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#dc2626;border-radius:50%"></div>頂点 $(s,t)$</div>
+        </div>
+      </div>
+    </div>
+    <div class="info-box">$a$ の符号で「上に凸・下に凸」が決まり、$(s,t)$ が頂点（最大値・最小値をとる点）の座標になります。</div>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-title">📝 確認問題</div>
+    <div class="quiz-q">
+      <div class="q-text">$y = -2(x-1)^2 + 5$ について正しいものはどれか？</div>
+      <div class="quiz-options" id="q2-opts">
+        <button class="opt-btn" onclick="checkQ('q2',0,2,'a=-2<0 なので上に凸の山型。x=1 で最大値 y=5 をとります。')">① $x=1$ で最小値 $5$</button>
+        <button class="opt-btn" onclick="checkQ('q2',1,2,'a=-2<0 なので上に凸の山型。x=1 で最大値 y=5 をとります。')">② $x=-1$ で最大値 $5$</button>
+        <button class="opt-btn" onclick="checkQ('q2',2,2,'a=-2<0 なので上に凸の山型。x=1 で最大値 y=5 をとります。')">③ $x=1$ で最大値 $5$</button>
+        <button class="opt-btn" onclick="checkQ('q2',3,2,'a=-2<0 なので上に凸の山型。x=1 で最大値 y=5 をとります。')">④ $x=5$ で最大値 $1$</button>
+      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 3: 平方完成 ===== -->
+<section id="s3" class="section">
+  <div class="section-title"><span class="badge">Section 3</span>平方完成で最大値・最小値を求める</div>
+  <p class="section-desc">一般の２次関数 $y=ax^2+bx+c$ を $y=a(x-s)^2+t$ の形に変形する手順です。</p>
+
+  <div class="card">
+    <div class="card-title">🔢 一般的な手順（平方完成）</div>
+    <p style="font-size:.9rem;margin-bottom:.8rem">$x^2$ の係数 $a$ でくくり、$\left(\dfrac{b}{2a}\right)^2$ を加えて引くことで平方の形を作ります。</p>
+    <div class="step-container">
+      <div class="step visible" id="g-s0">
+        <div class="step-box"><div class="step-num">出発点</div>
+          <div class="step-eq">$$y = ax^2+bx+c$$</div>
+        </div>
+      </div>
+      <div class="step" id="g-s1">
+        <div class="step-box"><div class="step-num">ステップ１：$a$ でくくる</div>
+          <div class="step-eq">$$y = a\left(x^2 + \frac{b}{a}x\right) + c$$</div>
+        </div>
+      </div>
+      <div class="step" id="g-s2">
+        <div class="step-box"><div class="step-num">ステップ２：$\left(\dfrac{b}{2a}\right)^2$ を加えて引く</div>
+          <div class="step-eq">$$y = a\left(x^2 + \frac{b}{a}x + \left(\frac{b}{2a}\right)^2 - \left(\frac{b}{2a}\right)^2\right) + c$$</div>
+        </div>
+      </div>
+      <div class="step" id="g-s3">
+        <div class="step-box"><div class="step-num">ステップ３：平方の形にまとめる</div>
+          <div class="step-eq">$$y = a\left(x+\frac{b}{2a}\right)^2 - \frac{b^2}{4a} + c = a\left(x+\frac{b}{2a}\right)^2 + \frac{4ac-b^2}{4a}$$</div>
+        </div>
+      </div>
+      <div class="step" id="g-s4">
+        <div class="step-box" style="border-color:var(--primary);background:var(--primary-bg)">
+          <div class="step-num">結論 ✅</div>
+          <p style="font-size:.92rem;margin-bottom:.4rem">$x = -\dfrac{b}{2a}$ のとき、</p>
+          <div class="step-eq">$$a>0 \implies \text{最小値 } y=\frac{4ac-b^2}{4a}, \qquad a<0 \implies \text{最大値 } y=\frac{4ac-b^2}{4a}$$</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:.6rem;margin-top:.8rem">
+      <button class="step-btn" id="g-next" onclick="nextStep('g',4)">次のステップ ▶</button>
+      <button class="step-btn reset-btn" onclick="resetSteps('g',4)">リセット</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🧮 井戸水の利潤関数に適用する</div>
+    <p style="font-size:.9rem;margin-bottom:.8rem">第1節で求めた $\pi = 6q - q^2 = -q^2+6q = -(q^2-6q)$ を平方完成してみましょう。</p>
+    <div class="step-container">
+      <div class="step visible" id="p-s0">
+        <div class="step-box"><div class="step-num">出発点：$q^2$ の係数でくくる</div>
+          <div class="step-eq">$$\pi = -(q^2 - 6q)$$</div>
+        </div>
+      </div>
+      <div class="step" id="p-s1">
+        <div class="step-box"><div class="step-num">ステップ１：$-6$ の半分 $-3$ の２乗 $9$ を加えて引く</div>
+          <div class="step-eq">$$\pi = -(q^2 - 6q + 9 - 9)$$</div>
+        </div>
+      </div>
+      <div class="step" id="p-s2">
+        <div class="step-box"><div class="step-num">ステップ２：平方の形にまとめる</div>
+          <div class="step-eq">$$\pi = -(q^2-6q+9) + 9 = -(q-3)^2 + 9$$</div>
+        </div>
+      </div>
+      <div class="step" id="p-s3">
+        <div class="step-box" style="border-color:var(--primary);background:var(--primary-bg)">
+          <div class="step-num">結論 ✅</div>
+          <div class="step-eq">$$q = 3 \ \text{で利潤が最大化し} \ \pi = 9$$</div>
+          <p style="margin-top:.5rem;font-size:.88rem;color:var(--green)">このとき価格は $p = 8-3 = 5$、収入 $R=15$、費用 $C=6$、利潤 $\pi = 15-6=9$ ✓</p>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:.6rem;margin-top:.8rem">
+      <button class="step-btn" id="p-next" onclick="nextStep('p',3)">次のステップ ▶</button>
+      <button class="step-btn reset-btn" onclick="resetSteps('p',3)">リセット</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🎛 頂点を確かめよう</div>
+    <p style="font-size:.88rem;color:var(--muted);margin-bottom:.8rem">スライダーで $q$ を動かし、$\pi=-(q-3)^2+9$ の値が頂点 $(3,9)$ で最大になることを確認しましょう。</p>
+    <div class="two-col">
+      <div>
+        <div class="control-group">
+          <div class="control-label">生産量 q = <span id="q3-val">3.0</span></div>
+          <input type="range" id="q3-sl" min="0" max="6" value="3" step="0.1" oninput="updateProfitVertex()">
+        </div>
+        <div class="result-panel">
+          <div class="result-row"><span>$\pi(q) = -(q-3)^2+9$</span><span class="result-val" id="p3-val">9.00</span></div>
+          <div class="result-row"><span>頂点（最大値）</span><span class="result-val">$(3,\ 9)$</span></div>
+        </div>
+        <div class="info-box" id="p3-hint">頂点と一致しています。これが最大値です！</div>
+      </div>
+      <div>
+        <div class="graph-wrap">
+          <canvas id="p3-canvas" width="360" height="300"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-title">📝 確認問題</div>
+    <div class="quiz-q">
+      <div class="q-text">$y = x^2 - 4x + 1$ を平方完成すると $y=(x-2)^2-3$ となる。この関数の最小値はいくつか？</div>
+      <div class="quiz-options" id="q3-opts">
+        <button class="opt-btn" onclick="checkQ('q3',0,1,'a=1>0 なので下に凸。頂点 (2,-3) で最小値 -3 をとります。')">① $x=2$ で最小値 $-3$</button>
+        <button class="opt-btn" onclick="checkQ('q3',1,1,'a=1>0 なので下に凸。頂点 (2,-3) で最小値 -3 をとります。')">② $x=-2$ で最小値 $3$</button>
+        <button class="opt-btn" onclick="checkQ('q3',2,1,'a=1>0 なので下に凸。頂点 (2,-3) で最小値 -3 をとります。')">③ $x=2$ で最大値 $-3$</button>
+        <button class="opt-btn" onclick="checkQ('q3',3,1,'a=1>0 なので下に凸。頂点 (2,-3) で最小値 -3 をとります。')">④ $x=4$ で最小値 $1$</button>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 4: 練習問題：価格設定 ===== -->
+<section id="s4" class="section">
+  <div class="section-title"><span class="badge">Section 4</span>練習問題：ラーメン屋の価格設定</div>
+  <p class="section-desc">教科書 例題2.1 を、価格 $p$ の関数と生産量 $q$ の関数の２通りで解いてみましょう。</p>
+
+  <div class="card">
+    <div class="card-title">📖 問題文</div>
+    <p style="font-size:.93rem">あなたはラーメン屋チェーンのオーナーで、A市のショッピングセンターに新しくラーメン屋をオープンさせるか検討している。このセンターには他にラーメン屋はなく、需要は１日あたり</p>
+    <div class="step-box">$$D(p) = 500 - \frac{1}{2}p \quad (0\le p \le 1000)$$</div>
+    <p style="font-size:.93rem">という需要関数で与えられる。ラーメン１杯を作る費用は人件費等を含めてちょうど<strong>400円</strong>である。</p>
+    <ol style="padding-left:1.3rem;margin-top:.6rem;font-size:.92rem;line-height:1.9">
+      <li>利潤を価格 $p$ の関数 $f(p)$、生産量 $q$ の関数 $g(q)$ として２通りの方法で求めなさい。</li>
+      <li>利潤を最大にするにはラーメンを１杯いくらで売ればよいか。</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔢 ２通りの解き方</div>
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="switchTab4('fp',this)">価格 $p$ の関数 $f(p)$</button>
+      <button class="tab-btn" onclick="switchTab4('gq',this)">生産量 $q$ の関数 $g(q)$</button>
+    </div>
+
+    <div id="fp" class="tab-content active">
+      <p style="font-size:.9rem;margin-bottom:.6rem">価格 $p$ で売ると、需要量（販売数量）は $D(p)$ 杯。１杯あたりの利益は $(p-400)$ 円なので…</p>
+      <div class="step-container">
+        <div class="step visible" id="fp-s0">
+          <div class="step-box"><div class="step-num">利潤関数を立てる</div>
+            <div class="step-eq">$$f(p) = (p-400)D(p) = (p-400)\left(500-\frac{1}{2}p\right)$$</div>
+          </div>
+        </div>
+        <div class="step" id="fp-s1">
+          <div class="step-box"><div class="step-num">ステップ１：展開する</div>
+            <div class="step-eq">$$f(p) = -\frac{1}{2}p^2 + 700p - 200000$$</div>
+          </div>
+        </div>
+        <div class="step" id="fp-s2">
+          <div class="step-box"><div class="step-num">ステップ２：平方完成する</div>
+            <div class="step-eq">$$f(p) = -\frac{1}{2}(p^2-1400p) - 200000 = -\frac{1}{2}(p-700)^2 + 45000$$</div>
+          </div>
+        </div>
+        <div class="step" id="fp-s3">
+          <div class="step-box" style="border-color:var(--primary);background:var(--primary-bg)">
+            <div class="step-num">結論 ✅</div>
+            <div class="step-eq">$$p=700 \ \text{のとき利潤が最大化し} \ f(700)=45000 \ \text{円}$$</div>
+            <p style="font-size:.88rem;color:var(--green);margin-top:.4rem">$0\le 700\le 1000$ なので定義域内。最適価格は <strong>700円</strong>。</p>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:.6rem;margin-top:.8rem">
+        <button class="step-btn" id="fp-next" onclick="nextStep('fp',3)">次のステップ ▶</button>
+        <button class="step-btn reset-btn" onclick="resetSteps('fp',3)">リセット</button>
+      </div>
+    </div>
+
+    <div id="gq" class="tab-content">
+      <p style="font-size:.9rem;margin-bottom:.6rem">$D(p)=500-\frac12 p$ を $p$ について解くと、逆需要関数 $p = P(q) = 1000-2q$。生産量 $q$ あたりの利益は $(P(q)-400)$ 円なので…</p>
+      <div class="step-container">
+        <div class="step visible" id="gq-s0">
+          <div class="step-box"><div class="step-num">利潤関数を立てる</div>
+            <div class="step-eq">$$g(q) = (P(q)-400)q = (1000-2q-400)q = (600-2q)q$$</div>
+          </div>
+        </div>
+        <div class="step" id="gq-s1">
+          <div class="step-box"><div class="step-num">ステップ１：展開する</div>
+            <div class="step-eq">$$g(q) = -2q^2 + 600q$$</div>
+          </div>
+        </div>
+        <div class="step" id="gq-s2">
+          <div class="step-box"><div class="step-num">ステップ２：平方完成する</div>
+            <div class="step-eq">$$g(q) = -2(q^2-300q) = -2(q-150)^2 + 45000$$</div>
+          </div>
+        </div>
+        <div class="step" id="gq-s3">
+          <div class="step-box" style="border-color:var(--primary);background:var(--primary-bg)">
+            <div class="step-num">結論 ✅</div>
+            <div class="step-eq">$$q=150 \ \text{のとき利潤が最大化し} \ g(150)=45000 \ \text{円}$$</div>
+            <p style="font-size:.88rem;color:var(--green);margin-top:.4rem">このとき価格は $p = P(150) = 1000-300 = 700$ 円となり、$f(p)$ の結果と一致します ✓</p>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:.6rem;margin-top:.8rem">
+        <button class="step-btn" id="gq-next" onclick="nextStep('gq',3)">次のステップ ▶</button>
+        <button class="step-btn reset-btn" onclick="resetSteps('gq',3)">リセット</button>
+      </div>
+    </div>
+    <div class="info-box">価格 $p$ で考えても、生産量 $q$ で考えても、<strong>同じ最適点</strong>（$p=700$ 円、$q=150$ 杯、利潤 $45{,}000$ 円）にたどり着きます。</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🎛 価格を変えて利潤の変化を観察しよう</div>
+    <div class="two-col">
+      <div>
+        <div class="control-group">
+          <div class="control-label">価格 p = <span id="rp-val">700</span> 円</div>
+          <input type="range" id="rp-sl" min="400" max="1000" value="700" step="10" oninput="updateRamen()">
+        </div>
+        <div class="result-panel">
+          <div class="result-row"><span>需要量 $q=D(p)$</span><span class="result-val" id="rp-q">150</span></div>
+          <div class="result-row"><span>１杯あたりの利益</span><span class="result-val" id="rp-margin">300円</span></div>
+          <div class="result-row"><span><strong>利潤 $f(p)$</strong></span><span class="result-val" id="rp-profit">45,000円</span></div>
+        </div>
+        <div class="info-box" id="rp-hint">$p=700$ 円のとき利潤は最大値 45,000円 です！</div>
+      </div>
+      <div>
+        <div class="graph-wrap">
+          <canvas id="rp-canvas" width="360" height="300"></canvas>
+        </div>
+        <div class="graph-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#1e40af"></div>$f(p)=-\frac12(p-700)^2+45000$</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#7c3aed;border-radius:50%"></div>現在の点</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#dc2626;border-radius:50%"></div>最大点</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-title">📝 確認問題</div>
+    <div class="quiz-q">
+      <div class="q-text">利潤を最大にするラーメン１杯の価格と、そのときの利潤の組み合わせとして正しいものはどれか？</div>
+      <div class="quiz-options" id="q4-opts">
+        <button class="opt-btn" onclick="checkQ('q4',0,2,'f(p)=-(1/2)(p-700)^2+45000 より、p=700円で最大値45,000円をとります。')">① 価格400円・利潤 0円</button>
+        <button class="opt-btn" onclick="checkQ('q4',1,2,'f(p)=-(1/2)(p-700)^2+45000 より、p=700円で最大値45,000円をとります。')">② 価格500円・利潤 37,500円</button>
+        <button class="opt-btn" onclick="checkQ('q4',2,2,'f(p)=-(1/2)(p-700)^2+45000 より、p=700円で最大値45,000円をとります。')">③ 価格700円・利潤 45,000円</button>
+        <button class="opt-btn" onclick="checkQ('q4',3,2,'f(p)=-(1/2)(p-700)^2+45000 より、p=700円で最大値45,000円をとります。')">④ 価格1000円・利潤 45,000円</button>
+      </div>
+      <div class="quiz-feedback" id="q4-fb"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 5: まとめ ===== -->
+<section id="s5" class="section">
+  <div class="section-title"><span class="badge">Section 5</span>まとめ</div>
+  <p class="section-desc">第4回の要点を整理しましょう。</p>
+  <div class="card">
+    <div class="card-title">✅ 今回のポイント</div>
+    <div class="summary-item"><div class="summary-num">1</div><div><strong>独占企業の利潤と２次関数</strong><br><span style="font-size:.9rem">需要関数が１次関数だと、独占した企業の収入（および利潤）が生産量の２次関数として表せる。</span></div></div>
+    <div class="summary-item"><div class="summary-num">2</div><div><strong>２次関数の最大値・最小値</strong><br><span style="font-size:.9rem">$y=a(x-s)^2+t$ の頂点 $(s,t)$ で、$a>0$ なら最小値、$a<0$ なら最大値をとる。</span></div></div>
+    <div class="summary-item"><div class="summary-num">3</div><div><strong>平方完成</strong><br><span style="font-size:.9rem">一般の２次関数 $y=ax^2+bx+c$ は $y=a\left(x+\dfrac{b}{2a}\right)^2+\dfrac{4ac-b^2}{4a}$ の形に変形でき、頂点が求まる。</span></div></div>
+    <div class="summary-item"><div class="summary-num">4</div><div><strong>微分との関係</strong><br><span style="font-size:.9rem">２次関数の最大値・最小値は、平方完成だけでなく、後半で学ぶ「微分」によっても求めることができる。</span></div></div>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-title">📝 最終確認問題</div>
+    <div class="quiz-q">
+      <div class="q-text">利潤関数が $\pi(q) = -3q^2 + 24q$ で表される独占企業がある。利潤を最大にする生産量 $q$ とそのときの利潤はどれか？（ヒント：$\pi=-3(q-4)^2+48$）</div>
+      <div class="quiz-options" id="q5-opts">
+        <button class="opt-btn" onclick="checkQ('q5',0,2,'π=-3q^2+24q=-3(q^2-8q)=-3(q-4)^2+48。よって q=4 で最大値 48 をとります。')">① $q=8$、利潤 $24$</button>
+        <button class="opt-btn" onclick="checkQ('q5',1,2,'π=-3q^2+24q=-3(q^2-8q)=-3(q-4)^2+48。よって q=4 で最大値 48 をとります。')">② $q=4$、利潤 $24$</button>
+        <button class="opt-btn" onclick="checkQ('q5',2,2,'π=-3q^2+24q=-3(q^2-8q)=-3(q-4)^2+48。よって q=4 で最大値 48 をとります。')">③ $q=4$、利潤 $48$</button>
+        <button class="opt-btn" onclick="checkQ('q5',3,2,'π=-3q^2+24q=-3(q^2-8q)=-3(q-4)^2+48。よって q=4 で最大値 48 をとります。')">④ $q=12$、利潤 $0$</button>
+      </div>
+      <div class="quiz-feedback" id="q5-fb"></div>
+    </div>
+  </div>
+
+  <div class="card" style="background:linear-gradient(135deg,var(--primary-bg),#f5f3ff);text-align:center;padding:2rem;margin-top:1.5rem">
+    <div style="font-size:2rem;margin-bottom:.5rem">🎓</div>
+    <div style="font-weight:700;font-size:1.1rem;margin-bottom:.5rem">お疲れ様でした！</div>
+    <a href="index.html" style="display:inline-block;margin-top:.5rem;background:#1a1a2e;color:#f7f3ee;text-decoration:none;font-size:.85rem;padding:.55rem 1.4rem;border-radius:4px;font-family:monospace;letter-spacing:.04em">← 講義一覧に戻る</a>
+  </div>
+</section>
+
+<script>
+// ===== NAVIGATION =====
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  if (id==='s1') updateMonopoly();
+  if (id==='s2') updateQuad();
+  if (id==='s3') updateProfitVertex();
+  if (id==='s4') updateRamen();
+  window.scrollTo(0,0);
+}
+
+// ===== TABS (section 4) =====
+function switchTab4(id, btn) {
+  document.querySelectorAll('#s4 .tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('#s4 .tab-row .tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ===== STEPS =====
+const SC={};
+function nextStep(p,max){
+  if(!SC[p])SC[p]=0;
+  if(SC[p]>=max)return;
+  SC[p]++;
+  const el=document.getElementById(`${p}-s${SC[p]}`);
+  if(el){el.classList.add('visible');if(typeof MathJax!=='undefined')MathJax.typesetPromise([el]);}
+  if(SC[p]>=max)document.getElementById(`${p}-next`).disabled=true;
+}
+function resetSteps(p,max){
+  SC[p]=0;
+  for(let i=1;i<=max;i++){const el=document.getElementById(`${p}-s${i}`);if(el)el.classList.remove('visible');}
+  document.getElementById(`${p}-next`).disabled=false;
+}
+
+// ===== QUIZ =====
+function checkQ(id,chosen,correct,explanation){
+  const opts=document.querySelectorAll(`#${id}-opts .opt-btn`);
+  opts.forEach((b,i)=>{b.disabled=true;if(i===correct)b.classList.add('correct');else if(i===chosen)b.classList.add('wrong');});
+  const fb=document.getElementById(`${id}-fb`);
+  fb.className=`quiz-feedback show ${chosen===correct?'ok':'ng'}`;
+  fb.textContent=(chosen===correct?'✅ 正解！':'❌ 不正解。')+'　'+explanation;
+  if(typeof MathJax!=='undefined')MathJax.typesetPromise([fb]);
+}
+
+// ===== Generic helpers =====
+function makeScale(xMin,xMax,yMin,yMax,w,h,pad){
+  return {
+    fx:x=>pad.l+(x-xMin)/(xMax-xMin)*(w-pad.l-pad.r),
+    fy:y=>h-pad.b-(y-yMin)/(yMax-yMin)*(h-pad.t-pad.b)
+  };
+}
+function drawGrid(ctx,w,h,pad,xTicks,yTicks,sc,xLabel,yLabel,fmt){
+  fmt = fmt || (v=>v);
+  ctx.save();
+  ctx.setLineDash([3,4]);ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1;
+  xTicks.forEach(x=>{
+    ctx.beginPath();ctx.moveTo(sc.fx(x),pad.t);ctx.lineTo(sc.fx(x),h-pad.b);ctx.stroke();
+    ctx.fillStyle='#94a3b8';ctx.font='9px sans-serif';ctx.textAlign='center';ctx.fillText(fmt(x),sc.fx(x),h-pad.b+13);
+  });
+  yTicks.forEach(y=>{
+    ctx.beginPath();ctx.moveTo(pad.l,sc.fy(y));ctx.lineTo(w-pad.r,sc.fy(y));ctx.stroke();
+    ctx.fillStyle='#94a3b8';ctx.font='9px sans-serif';ctx.textAlign='right';ctx.fillText(fmt(y),pad.l-5,sc.fy(y)+3);
+  });
+  ctx.setLineDash([]);
+  ctx.strokeStyle='#475569';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l,h-pad.b);ctx.lineTo(w-pad.r,h-pad.b);ctx.stroke();
+  ctx.fillStyle='#1e293b';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.fillText(xLabel,w/2,h-6);
+  ctx.save();ctx.translate(13,h/2);ctx.rotate(-Math.PI/2);ctx.fillText(yLabel,0,0);ctx.restore();
+  ctx.restore();
+}
+function drawCurve(ctx,sc,fn,xMin,xMax,color,lw,pad,w,h){
+  ctx.save();
+  if(pad){ctx.beginPath();ctx.rect(pad.l,pad.t,w-pad.l-pad.r,h-pad.t-pad.b);ctx.clip();}
+  ctx.strokeStyle=color;ctx.lineWidth=lw||2.5;ctx.beginPath();
+  const N=160;
+  for(let i=0;i<=N;i++){
+    const x=xMin+(xMax-xMin)*i/N, y=fn(x);
+    const px=sc.fx(x), py=sc.fy(y);
+    if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+  }
+  ctx.stroke();ctx.restore();
+}
+function drawDot(ctx,sc,x,y,color,r,label,labelDx,labelDy){
+  ctx.save();
+  ctx.fillStyle=color;ctx.beginPath();ctx.arc(sc.fx(x),sc.fy(y),r||5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(sc.fx(x),sc.fy(y),(r||5)-2.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=color;ctx.beginPath();ctx.arc(sc.fx(x),sc.fy(y),(r||5)-3.5,0,Math.PI*2);ctx.fill();
+  if(label){ctx.font='bold 10px sans-serif';ctx.textAlign='left';ctx.fillText(label,sc.fx(x)+(labelDx||7),sc.fy(y)+(labelDy||-6));}
+  ctx.restore();
+}
+
+// ===== Section 1: 独占の利潤 π = 6q - q^2 =====
+function updateMonopoly(){
+  const q=+document.getElementById('q1-sl').value;
+  document.getElementById('q1-val').textContent=q;
+  const p=8-q, R=p*q, C=2*q, profit=R-C;
+  document.getElementById('m-p').textContent=p;
+  document.getElementById('m-r').textContent=R;
+  document.getElementById('m-c').textContent=C;
+  document.getElementById('m-pi').textContent=profit;
+  const hint=document.getElementById('m-hint');
+  if(q===3) hint.textContent='q=3 のとき利潤は最大値 9 をとります！';
+  else if(profit < 9) hint.textContent=`q=${q} の利潤は ${profit}。最大値 9（q=3）より小さくなっています。`;
+  const c=document.getElementById('m-canvas');
+  const ctx=c.getContext('2d'),w=c.width,h=c.height,pad={l:50,r:18,t:20,b:42};
+  ctx.clearRect(0,0,w,h);
+  const sc=makeScale(0,6,-6,10,w,h,pad);
+  drawGrid(ctx,w,h,pad,[0,1,2,3,4,5,6],[-6,-3,0,3,6,9],sc,'生産量 q','利潤 π');
+  drawCurve(ctx,sc,x=>6*x-x*x,0,6,'#1e40af',2.5,pad,w,h);
+  drawDot(ctx,sc,3,9,'#dc2626',5,'最大 (3, 9)',8,-8);
+  drawDot(ctx,sc,q,profit,'#7c3aed',6,`(${q}, ${profit})`,8,16);
+}
+
+// ===== Section 2: 一般の２次関数 y = a(x-s)^2 + t =====
+function updateQuad(){
+  const a=+document.getElementById('a-sl').value;
+  const s=+document.getElementById('s-sl').value;
+  const t=+document.getElementById('t-sl').value;
+  document.getElementById('a-val').textContent=a;
+  document.getElementById('s-val').textContent=s;
+  document.getElementById('t-val').textContent=t;
+  const sStr = s===0?'x':(s>0?`(x-${s})`:`(x+${Math.abs(s)})`);
+  const tStr = t===0?'':(t>0?` + ${t}`:` - ${Math.abs(t)}`);
+  document.getElementById('quad-eq').innerHTML = a===1? `$y = ${sStr}^2${tStr}$` : a===-1 ? `$y = -${sStr}^2${tStr}$` : `$y = ${a}${sStr}^2${tStr}$`;
+  document.getElementById('quad-shape').textContent = a>0?'下に凸（谷型）':(a<0?'上に凸（山型）':'退化（直線）');
+  document.getElementById('quad-ext').innerHTML = a>0? `$x=${s}$ で最小値 $y=${t}$` : (a<0? `$x=${s}$ で最大値 $y=${t}$` : `最大値・最小値なし（$a=0$）`);
+  const c=document.getElementById('quad-canvas');
+  const ctx=c.getContext('2d'),w=c.width,h=c.height,pad={l:48,r:18,t:20,b:42};
+  ctx.clearRect(0,0,w,h);
+  const sc=makeScale(-6,6,-12,12,w,h,pad);
+  drawGrid(ctx,w,h,pad,[-6,-4,-2,0,2,4,6],[-12,-8,-4,0,4,8,12],sc,'x','y');
+  drawCurve(ctx,sc,x=>a*(x-s)*(x-s)+t,-6,6,'#1e40af',2.5,pad,w,h);
+  if(t>=-12&&t<=12) drawDot(ctx,sc,s,t,'#dc2626',5,`頂点 (${s}, ${t})`,8,-8);
+  if(typeof MathJax!=='undefined')MathJax.typesetPromise([document.getElementById('quad-eq'),document.getElementById('quad-ext')]);
+}
+
+// ===== Section 3: 利潤関数の頂点確認 π = -(q-3)^2 + 9 =====
+function updateProfitVertex(){
+  const q=+document.getElementById('q3-sl').value;
+  document.getElementById('q3-val').textContent=q.toFixed(1);
+  const pi=-(q-3)*(q-3)+9;
+  document.getElementById('p3-val').textContent=pi.toFixed(2);
+  const hint=document.getElementById('p3-hint');
+  if(Math.abs(q-3)<0.05) hint.textContent='頂点 (3, 9) と一致しています。これが最大値です！';
+  else hint.textContent=`q=${q.toFixed(1)} の利潤は ${pi.toFixed(2)}。頂点 (3, 9) の方が大きいですね。`;
+  const c=document.getElementById('p3-canvas');
+  const ctx=c.getContext('2d'),w=c.width,h=c.height,pad={l:50,r:18,t:20,b:42};
+  ctx.clearRect(0,0,w,h);
+  const sc=makeScale(0,6,-6,10,w,h,pad);
+  drawGrid(ctx,w,h,pad,[0,1,2,3,4,5,6],[-6,-3,0,3,6,9],sc,'生産量 q','利潤 π');
+  drawCurve(ctx,sc,x=>-(x-3)*(x-3)+9,0,6,'#1e40af',2.5,pad,w,h);
+  drawDot(ctx,sc,3,9,'#dc2626',5,'頂点 (3, 9)',8,-8);
+  drawDot(ctx,sc,q,pi,'#7c3aed',6,`(${q.toFixed(1)}, ${pi.toFixed(2)})`,8,16);
+}
+
+// ===== Section 4: ラーメン屋 f(p) = -(1/2)(p-700)^2 + 45000 =====
+function updateRamen(){
+  const p=+document.getElementById('rp-sl').value;
+  document.getElementById('rp-val').textContent=p;
+  const q=500-0.5*p;
+  const margin=p-400;
+  const profit=-0.5*(p-700)*(p-700)+45000;
+  document.getElementById('rp-q').textContent=q.toFixed(0);
+  document.getElementById('rp-margin').textContent=margin.toFixed(0)+'円';
+  document.getElementById('rp-profit').textContent=Math.round(profit).toLocaleString()+'円';
+  const hint=document.getElementById('rp-hint');
+  if(p===700) hint.textContent='p=700 円のとき利潤は最大値 45,000円 です！';
+  else hint.textContent=`p=${p}円 の利潤は ${Math.round(profit).toLocaleString()}円。最大値 45,000円（p=700円）より少なくなっています。`;
+  const c=document.getElementById('rp-canvas');
+  const ctx=c.getContext('2d'),w=c.width,h=c.height,pad={l:62,r:18,t:20,b:42};
+  ctx.clearRect(0,0,w,h);
+  const sc=makeScale(350,1050,0,50000,w,h,pad);
+  drawGrid(ctx,w,h,pad,[400,550,700,850,1000],[0,15000,30000,45000],sc,'価格 p（円）','利潤 f(p)（円）',v=>v.toLocaleString());
+  drawCurve(ctx,sc,x=>-0.5*(x-700)*(x-700)+45000,400,1000,'#1e40af',2.5,pad,w,h);
+  drawDot(ctx,sc,700,45000,'#dc2626',5,'最大点',-40,-10);
+  drawDot(ctx,sc,p,profit,'#7c3aed',6,`(${p}, ${Math.round(profit).toLocaleString()})`,8,16);
+}
+
+document.addEventListener('DOMContentLoaded',()=>{updateMonopoly();updateQuad();updateProfitVertex();updateRamen();});
+</script>
+</body>
+</html>
