@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>経済数学入門B 第２回 | 1次関数と市場メカニズム</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --ink: #1a1a2e;
+    --paper: #f7f3ee;
+    --accent: #c0392b;
+    --accent2: #2980b9;
+    --muted: #8a7f74;
+    --border: #d4cfc9;
+    --correct: #27ae60;
+    --wrong: #e74c3c;
+    --highlight: #f39c12;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Serif JP', serif;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 3rem 2rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    border: 3px solid var(--accent);
+    border-radius: 50%;
+    opacity: 0.3;
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px; left: 10%;
+    width: 300px; height: 1px;
+    background: var(--accent);
+    opacity: 0.5;
+  }
+  .header-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+  }
+  header h1 {
+    font-size: clamp(1.4rem, 4vw, 2.2rem);
+    font-weight: 900;
+    line-height: 1.3;
+  }
+  header p {
+    margin-top: 0.5rem;
+    color: rgba(247,243,238,0.6);
+    font-size: 0.9rem;
+  }
+
+  /* NAV */
+  nav {
+    background: var(--ink);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding: 0 2rem;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+  }
+  nav button {
+    background: none;
+    border: none;
+    color: rgba(247,243,238,0.5);
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.85rem;
+    padding: 0.9rem 1.2rem;
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  nav button:hover { color: var(--paper); }
+  nav button.active {
+    color: var(--paper);
+    border-bottom-color: var(--accent);
+  }
+
+  /* MAIN */
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  /* SECTIONS */
+  .section { display: none; animation: fadeIn 0.3s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* CARDS */
+  .card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 2px 2px 0 var(--border);
+  }
+  .card-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+  }
+  .card h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 0.5rem;
+  }
+  .card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 1rem 0 0.4rem;
+    color: var(--accent2);
+  }
+  .card p { margin-bottom: 0.7rem; font-size: 0.95rem; }
+  .card ul { padding-left: 1.5rem; font-size: 0.95rem; }
+  .card ul li { margin-bottom: 0.3rem; }
+
+  /* DEFINITION BOX */
+  .def-box {
+    background: #eef4fb;
+    border-left: 4px solid var(--accent2);
+    padding: 1rem 1.2rem;
+    margin: 1rem 0;
+    border-radius: 0 4px 4px 0;
+  }
+  .def-box .def-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent2);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.3rem;
+  }
+  .def-box p { margin: 0; font-size: 0.95rem; }
+
+  /* TABLE */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+  }
+  th {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0.5rem 0.8rem;
+    text-align: left;
+    font-weight: 400;
+  }
+  td {
+    padding: 0.5rem 0.8rem;
+    border-bottom: 1px solid var(--border);
+  }
+  tr:nth-child(even) td { background: #f9f7f5; }
+
+  /* ===== GRAPH SECTION ===== */
+  .graph-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  @media (max-width: 600px) { .graph-controls { grid-template-columns: 1fr; } }
+
+  .control-group label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 0.3rem;
+    font-family: 'Space Mono', monospace;
+  }
+  .control-group .val {
+    font-family: 'Space Mono', monospace;
+    font-size: 1rem;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  input[type=range] {
+    width: 100%;
+    accent-color: var(--accent);
+  }
+
+  .function-display {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Space Mono', monospace;
+    font-size: 1.1rem;
+    text-align: center;
+    padding: 0.8rem;
+    border-radius: 4px;
+    margin: 1rem 0;
+    letter-spacing: 0.05em;
+  }
+  .function-display span { color: var(--accent); }
+
+  .chart-wrap {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .graph-info {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
+    margin-top: 1rem;
+  }
+  .info-chip {
+    background: #f0f0f0;
+    border-radius: 4px;
+    padding: 0.6rem 0.8rem;
+    text-align: center;
+  }
+  .info-chip .chip-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .info-chip .chip-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-top: 0.2rem;
+  }
+
+  /* ===== STEP SECTION ===== */
+  .step-nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .step-nav button {
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 0.5rem 1.2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: background 0.15s;
+  }
+  .step-nav button:hover { background: var(--accent); }
+  .step-nav button:disabled { background: var(--border); color: var(--muted); cursor: default; }
+  .step-counter {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .step-dots {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+  }
+  .step-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background 0.2s;
+  }
+  .step-dot.active { background: var(--accent); }
+  .step-dot.done { background: var(--accent2); }
+
+  .step-card {
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  .step-card.active { display: block; }
+
+  .step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem; height: 2rem;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    border-radius: 50%;
+    margin-bottom: 0.8rem;
+  }
+
+  .math-box {
+    background: #1a1a2e;
+    color: #f7f3ee;
+    font-family: 'Space Mono', monospace;
+    padding: 1rem 1.5rem;
+    border-radius: 4px;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+    line-height: 2;
+  }
+  .math-box .comment { color: #8a9ab5; font-size: 0.8rem; }
+  .math-box .highlight { color: #f39c12; }
+  .math-box .result { color: #2ecc71; font-weight: 700; }
+
+  /* ===== QUIZ SECTION ===== */
+  .quiz-progress {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 1.5rem;
+  }
+  .quiz-bar {
+    height: 4px;
+    flex: 1;
+    background: var(--border);
+    border-radius: 2px;
+    transition: background 0.3s;
+  }
+  .quiz-bar.correct { background: var(--correct); }
+  .quiz-bar.wrong { background: var(--wrong); }
+  .quiz-bar.current { background: var(--highlight); }
+
+  .quiz-score {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+
+  .quiz-question {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 1.2rem;
+    line-height: 1.6;
+  }
+
+  .quiz-options {
+    display: grid;
+    gap: 0.7rem;
+    margin-bottom: 1.2rem;
+  }
+  .quiz-option {
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    padding: 0.8rem 1rem;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .quiz-option:hover:not(:disabled) {
+    border-color: var(--accent2);
+    background: #eef4fb;
+  }
+  .quiz-option.correct { border-color: var(--correct); background: #eafaf1; }
+  .quiz-option.wrong { border-color: var(--wrong); background: #fdecea; }
+  .quiz-option:disabled { cursor: default; }
+  .opt-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    width: 1.4rem; height: 1.4rem;
+    border-radius: 50%;
+    background: var(--border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-weight: 700;
+  }
+  .quiz-option.correct .opt-label { background: var(--correct); color: white; }
+  .quiz-option.wrong .opt-label { background: var(--wrong); color: white; }
+
+  .quiz-feedback {
+    padding: 0.8rem 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct { background: #eafaf1; border-left: 3px solid var(--correct); }
+  .quiz-feedback.wrong { background: #fdecea; border-left: 3px solid var(--wrong); }
+
+  .quiz-next {
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 0.7rem 2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border-radius: 2px;
+    display: none;
+    transition: background 0.15s;
+  }
+  .quiz-next:hover { background: var(--accent); }
+  .quiz-next.show { display: inline-block; }
+
+  .quiz-result {
+    text-align: center;
+    padding: 2rem;
+    display: none;
+  }
+  .quiz-result.show { display: block; }
+  .result-score {
+    font-family: 'Space Mono', monospace;
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .result-label { color: var(--muted); margin: 0.5rem 0 1.5rem; font-size: 0.9rem; }
+  .result-msg { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.5rem; }
+  .quiz-restart {
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 0.7rem 2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: background 0.15s;
+  }
+  .quiz-restart:hover { background: var(--accent); }
+
+  /* GOALS */
+  .goals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .goal-item {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1rem;
+    border-top: 3px solid var(--accent);
+  }
+  .goal-item .goal-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+  .goal-item p { font-size: 0.85rem; color: var(--muted); margin: 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-label">経済数学入門B — 第2回</div>
+  <h1>１次関数と市場メカニズム①</h1>
+  <p>１次関数がわかるだけでも十分に色々わかる ／ 小島健</p>
+</header>
+
+<nav>
+  <button class="active" onclick="showSection('overview', this)">概要</button>
+  <button onclick="showSection('graph', this)">📈 グラフ可視化</button>
+  <button onclick="showSection('steps', this)">📝 例題ステップ</button>
+  <button onclick="showSection('quiz', this)">🎯 理解度クイズ</button>
+</nav>
+
+<main>
+
+  <!-- OVERVIEW -->
+  <div id="overview" class="section active">
+    <div class="card">
+      <div class="card-title">今日のゴール</div>
+      <div class="goals-grid">
+        <div class="goal-item">
+          <div class="goal-icon">🗺️</div>
+          <strong>関数の理解</strong>
+          <p>関数・写像とは何かを理解する</p>
+        </div>
+        <div class="goal-item">
+          <div class="goal-icon">🔢</div>
+          <strong>数学的思考</strong>
+          <p>経済学の問題を数学の問題としてとらえる</p>
+        </div>
+        <div class="goal-item">
+          <div class="goal-icon">📏</div>
+          <strong>１次関数</strong>
+          <p>１次関数を用いた経済学の問題が解ける</p>
+        </div>
+        <div class="goal-item">
+          <div class="goal-icon">➕</div>
+          <strong>線形性</strong>
+          <p>比例関数の線形性（加法性・斉次性）を理解する</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">キー概念</div>
+      <h2>関数と写像</h2>
+      <div class="def-box">
+        <div class="def-label">定義 — 写像 (mapping)</div>
+        <p>片方を１つ決めると、もう片方が１つに決まるルールのことである。</p>
+      </div>
+      <div class="def-box">
+        <div class="def-label">定義 — 関数 (function)</div>
+        <p>写像を数字だけに絞ったもの。片方の数字を１つ決めると、もう片方の数字が１つに決まるルールのことである。</p>
+      </div>
+      <h3>説明変数と被説明変数</h3>
+      <table>
+        <tr><th>用語</th><th>別名</th><th>役割</th></tr>
+        <tr><td>説明変数</td><td>独立変数</td><td>決める数字（入力）</td></tr>
+        <tr><td>被説明変数</td><td>従属変数</td><td>決まる数字（出力）</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title">キー概念</div>
+      <h2>１次関数と線形性</h2>
+      <div class="def-box">
+        <div class="def-label">定義 — １次関数</div>
+        <p>説明変数の次数が１である関数。グラフで書くと<strong>直線</strong>で表すことができる。</p>
+      </div>
+      <div class="def-box">
+        <div class="def-label">定義 — 比例関数（線形関数）</div>
+        <p>１次関数のうち、定数項（切片）が０である関数。</p>
+      </div>
+      <h3>線形性の２つの性質</h3>
+      <table>
+        <tr><th>性質</th><th>数式</th><th>意味</th></tr>
+        <tr><td>加法性</td><td>f(X + Y) = f(X) + f(Y)</td><td>まとめて変換 = それぞれ変換して足す</td></tr>
+        <tr><td>斉次性</td><td>f(aX) = a·f(X)</td><td>a倍してから変換 = 変換してからa倍</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- GRAPH -->
+  <div id="graph" class="section">
+    <div class="card">
+      <div class="card-title">インタラクティブ</div>
+      <h2>１次関数グラフ</h2>
+      <p>スライダーを動かして a（傾き）と b（切片）を変えてみましょう。</p>
+
+      <div class="function-display">
+        y = <span id="disp-a">1</span>x + <span id="disp-b">0</span>
+      </div>
+
+      <div class="graph-controls">
+        <div class="control-group">
+          <label>a（傾き）: <span class="val" id="val-a">1.0</span></label>
+          <input type="range" id="slider-a" min="-5" max="5" step="0.5" value="1">
+        </div>
+        <div class="control-group">
+          <label>b（切片）: <span class="val" id="val-b">0.0</span></label>
+          <input type="range" id="slider-b" min="-10" max="10" step="1" value="0">
+        </div>
+      </div>
+
+      <div class="chart-wrap">
+        <canvas id="linearChart" height="280"></canvas>
+      </div>
+
+      <div class="graph-info">
+        <div class="info-chip">
+          <div class="chip-label">傾き (a)</div>
+          <div class="chip-val" id="info-a">1.0</div>
+        </div>
+        <div class="info-chip">
+          <div class="chip-label">切片 (b)</div>
+          <div class="chip-val" id="info-b">0</div>
+        </div>
+        <div class="info-chip">
+          <div class="chip-label">x=5 のとき y =</div>
+          <div class="chip-val" id="info-y5">5</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">アイスクリーム需要曲線</div>
+      <h2>価格と購入量の関係</h2>
+      <p>価格（説明変数）が上がると購入量（被説明変数）は下がります。</p>
+      <div class="chart-wrap">
+        <canvas id="demandChart" height="240"></canvas>
+      </div>
+      <div class="def-box">
+        <div class="def-label">逆需要関数</div>
+        <p>価格を P、購入量を Q とすると：<strong>P = −200Q + 800</strong>（切片800、傾き−200）</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEPS -->
+  <div id="steps" class="section">
+    <div class="card">
+      <div class="card-title">ステップ解説</div>
+      <h2>例題 1.2 ― 自動車工場の生産台数</h2>
+      <p style="color:var(--muted);font-size:0.9rem;">「前へ」「次へ」ボタンで1ステップずつ確認できます。</p>
+
+      <div class="step-nav">
+        <button id="btn-prev" onclick="changeStep(-1)" disabled>← 前へ</button>
+        <span class="step-counter" id="step-counter">1 / 5</span>
+        <button id="btn-next" onclick="changeStep(1)">次へ →</button>
+        <div class="step-dots" id="step-dots"></div>
+      </div>
+
+      <!-- Step 1 -->
+      <div class="step-card active" id="step-0">
+        <div class="step-number">1</div>
+        <h3>問題を読む</h3>
+        <div class="card" style="background:#f9f7f5;box-shadow:none;">
+          <p>工場Aでは、<strong>１日あたり100台</strong>の自動車が生産されている。</p>
+          <ul>
+            <li>（１）時間を t（日）とし、工場A の t 日間の累計生産台数を X(t) で表せ。</li>
+            <li>（２）工場B（１日200台）も含めた総累計生産台数を Y(t) で表せ。</li>
+          </ul>
+        </div>
+        <p style="color:var(--muted);font-size:0.85rem;">まず「何が説明変数で、何が被説明変数か」を確認しましょう。</p>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step-card" id="step-1">
+        <div class="step-number">2</div>
+        <h3>変数を整理する</h3>
+        <table>
+          <tr><th>変数</th><th>意味</th><th>種類</th></tr>
+          <tr><td>t</td><td>経過日数（日）</td><td>説明変数（独立変数）</td></tr>
+          <tr><td>X(t)</td><td>工場Aの累計生産台数</td><td>被説明変数（従属変数）</td></tr>
+          <tr><td>Y(t)</td><td>工場A＋Bの累計生産台数</td><td>被説明変数（従属変数）</td></tr>
+        </table>
+        <p>t が決まると X(t) が決まる → <strong>関数</strong>の関係です。</p>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step-card" id="step-2">
+        <div class="step-number">3</div>
+        <h3>（１）工場Aの関数 X(t) を求める</h3>
+        <p>１日に100台生産する → t 日間では…</p>
+        <div class="math-box">
+          <span class="comment">// 1日あたりの生産台数 × 日数</span><br>
+          X(t) = 100 × t<br>
+          <span class="highlight">X(t) = 100t</span><br>
+          <br>
+          <span class="comment">// 確認: t=0 → X(0)=0, t=1 → X(1)=100, t=10 → X(10)=1000</span>
+        </div>
+        <p>これは<strong>比例関数（切片=0の１次関数）</strong>です。</p>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step-card" id="step-3">
+        <div class="step-number">4</div>
+        <h3>（２）工場A＋Bの関数 Y(t) を求める</h3>
+        <p>線形性（加法性）を使います：</p>
+        <div class="math-box">
+          <span class="comment">// 工場Bの関数</span><br>
+          B(t) = 200t<br><br>
+          <span class="comment">// 線形性（加法性）: f(X+Y) = f(X) + f(Y)</span><br>
+          Y(t) = X(t) + B(t)<br>
+          Y(t) = 100t + 200t<br>
+          <span class="result">Y(t) = 300t</span>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="step-card" id="step-4">
+        <div class="step-number">5</div>
+        <h3>まとめと確認</h3>
+        <table>
+          <tr><th>関数</th><th>式</th><th>t=10日後</th></tr>
+          <tr><td>X(t)（工場A）</td><td>100t</td><td>1,000台</td></tr>
+          <tr><td>B(t)（工場B）</td><td>200t</td><td>2,000台</td></tr>
+          <tr><td>Y(t)（合計）</td><td>300t</td><td>3,000台</td></tr>
+        </table>
+        <div class="def-box">
+          <div class="def-label">ポイント</div>
+          <p>比例関数は<strong>線形性</strong>を持つので、Y(t) = X(t) + B(t) という足し算が成立します。これが加法性です。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz" class="section">
+    <div class="card">
+      <div class="card-title">理解度チェック</div>
+      <h2>確認クイズ（全5問）</h2>
+
+      <div class="quiz-progress" id="quiz-progress"></div>
+      <div class="quiz-score" id="quiz-score">正解: 0 / 0</div>
+
+      <div id="quiz-body">
+        <div class="quiz-question" id="q-text"></div>
+        <div class="quiz-options" id="q-options"></div>
+        <div class="quiz-feedback" id="q-feedback"></div>
+        <button class="quiz-next" id="q-next" onclick="nextQuestion()">次の問題 →</button>
+      </div>
+
+      <div class="quiz-result" id="quiz-result">
+        <div class="result-score" id="result-score"></div>
+        <div class="result-label">/ 5問中</div>
+        <div class="result-msg" id="result-msg"></div>
+        <button class="quiz-restart" onclick="restartQuiz()">もう一度挑戦する</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ===== NAV =====
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ===== GRAPH =====
+const ctxLinear = document.getElementById('linearChart').getContext('2d');
+let aVal = 1, bVal = 0;
+
+function makeLinearData(a, b) {
+  const labels = [], data = [];
+  for (let x = -10; x <= 10; x++) {
+    labels.push(x);
+    data.push(a * x + b);
+  }
+  return { labels, data };
+}
+
+let linearChart = new Chart(ctxLinear, {
+  type: 'line',
+  data: {
+    labels: makeLinearData(1,0).labels,
+    datasets: [{
+      label: 'y = ax + b',
+      data: makeLinearData(1,0).data,
+      borderColor: '#c0392b',
+      backgroundColor: 'rgba(192,57,43,0.08)',
+      borderWidth: 2.5,
+      pointRadius: 3,
+      pointBackgroundColor: '#c0392b',
+      tension: 0
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: {
+        title: { display: true, text: 'x（説明変数）', font: { family: "'Space Mono'" } },
+        grid: { color: '#e8e4df' }
+      },
+      y: {
+        title: { display: true, text: 'y（被説明変数）', font: { family: "'Space Mono'" } },
+        grid: { color: '#e8e4df' }
+      }
+    }
+  }
+});
+
+function updateGraph() {
+  aVal = parseFloat(document.getElementById('slider-a').value);
+  bVal = parseFloat(document.getElementById('slider-b').value);
+  const d = makeLinearData(aVal, bVal);
+  linearChart.data.labels = d.labels;
+  linearChart.data.datasets[0].data = d.data;
+  linearChart.data.datasets[0].label = `y = ${aVal}x + ${bVal}`;
+  linearChart.update();
+  const aStr = aVal % 1 === 0 ? aVal.toFixed(0) : aVal.toFixed(1);
+  const bStr = bVal;
+  document.getElementById('val-a').textContent = aStr;
+  document.getElementById('val-b').textContent = bStr;
+  document.getElementById('info-a').textContent = aStr;
+  document.getElementById('info-b').textContent = bStr;
+  document.getElementById('info-y5').textContent = (aVal * 5 + bVal).toFixed(1);
+  document.getElementById('disp-a').textContent = aStr;
+  document.getElementById('disp-b').textContent = (bVal >= 0 ? '' : '') + bStr;
+}
+document.getElementById('slider-a').addEventListener('input', updateGraph);
+document.getElementById('slider-b').addEventListener('input', updateGraph);
+
+// Demand chart
+const ctxDemand = document.getElementById('demandChart').getContext('2d');
+new Chart(ctxDemand, {
+  type: 'line',
+  data: {
+    labels: [1, 2, 3, 4],
+    datasets: [{
+      label: '需要曲線 P = -200Q + 800',
+      data: [600, 400, 200, 0],
+      borderColor: '#2980b9',
+      backgroundColor: 'rgba(41,128,185,0.08)',
+      borderWidth: 2.5,
+      pointRadius: 6,
+      pointBackgroundColor: '#2980b9',
+      tension: 0
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: true, labels: { font: { family: "'Noto Serif JP'" } } },
+      tooltip: {
+        callbacks: {
+          label: ctx => `価格: ${ctx.parsed.y}円 / 購入量: ${ctx.parsed.x}個`
+        }
+      }
+    },
+    scales: {
+      x: { title: { display: true, text: '購入量 Q（個）' }, min: 0, max: 5 },
+      y: { title: { display: true, text: '価格 P（円）' }, min: -100, max: 900 }
+    }
+  }
+});
+
+// ===== STEPS =====
+let currentStep = 0;
+const totalSteps = 5;
+
+function buildDots() {
+  const cont = document.getElementById('step-dots');
+  for (let i = 0; i < totalSteps; i++) {
+    const d = document.createElement('div');
+    d.className = 'step-dot' + (i === 0 ? ' active' : '');
+    d.id = 'dot-' + i;
+    cont.appendChild(d);
+  }
+}
+buildDots();
+
+function changeStep(dir) {
+  document.getElementById('step-' + currentStep).classList.remove('active');
+  document.getElementById('dot-' + currentStep).classList.remove('active');
+  document.getElementById('dot-' + currentStep).classList.add('done');
+
+  currentStep += dir;
+  if (currentStep < 0) currentStep = 0;
+  if (currentStep >= totalSteps) currentStep = totalSteps - 1;
+
+  document.getElementById('step-' + currentStep).classList.add('active');
+  document.getElementById('dot-' + currentStep).classList.remove('done');
+  document.getElementById('dot-' + currentStep).classList.add('active');
+
+  document.getElementById('step-counter').textContent = `${currentStep + 1} / ${totalSteps}`;
+  document.getElementById('btn-prev').disabled = currentStep === 0;
+  document.getElementById('btn-next').disabled = currentStep === totalSteps - 1;
+}
+
+// ===== QUIZ =====
+const questions = [
+  {
+    q: "「片方の数字を1つ決めると、もう片方の数字が1つに決まるルール」のことを何と呼ぶか？",
+    opts: ["写像 (mapping)", "関数 (function)", "逆関数", "線形写像"],
+    ans: 1,
+    exp: "正解！写像は数字以外も含みますが、関数は数字同士の対応関係です。写像を数字だけに絞ったものが関数です。"
+  },
+  {
+    q: "１次関数 y = 2x − 3 において、説明変数（独立変数）はどれか？",
+    opts: ["y", "x", "2", "−3"],
+    ans: 1,
+    exp: "正解！x が説明変数（入力）、y が被説明変数（出力）です。"
+  },
+  {
+    q: "比例関数とはどのような関数か？",
+    opts: ["説明変数の次数が2である関数", "切片（定数項）が0の1次関数", "傾きが1の関数", "y=xで表される関数のみ"],
+    ans: 1,
+    exp: "正解！比例関数は y = ax の形で、切片が0の1次関数です。線形関数とも呼ばれます。"
+  },
+  {
+    q: "線形性の加法性を表す数式はどれか？",
+    opts: ["f(X × Y) = f(X) × f(Y)", "f(X + Y) = f(X) + f(Y)", "f(aX) = a × f(X)", "f(X) + f(Y) = X + Y"],
+    ans: 1,
+    exp: "正解！加法性は f(X+Y) = f(X)+f(Y) です。斉次性は f(aX) = a・f(X) です。"
+  },
+  {
+    q: "工場Aが1日100台、工場Bが1日200台生産するとき、t日間の合計生産台数 Y(t) は？",
+    opts: ["Y(t) = 200t", "Y(t) = 100t + 200", "Y(t) = 300t", "Y(t) = 300t + 100"],
+    ans: 2,
+    exp: "正解！X(t)=100t, B(t)=200t。線形性（加法性）より Y(t) = X(t)+B(t) = 100t+200t = 300t です。"
+  }
+];
+
+let qIndex = 0, score = 0, answered = [];
+
+function buildProgress() {
+  const cont = document.getElementById('quiz-progress');
+  cont.innerHTML = '';
+  for (let i = 0; i < questions.length; i++) {
+    const b = document.createElement('div');
+    b.className = 'quiz-bar' + (i === qIndex ? ' current' : '') +
+      (answered[i] === true ? ' correct' : answered[i] === false ? ' wrong' : '');
+    cont.appendChild(b);
+  }
+}
+
+function renderQuestion() {
+  const q = questions[qIndex];
+  document.getElementById('q-text').textContent = `Q${qIndex+1}. ${q.q}`;
+  const optsCont = document.getElementById('q-options');
+  optsCont.innerHTML = '';
+  const labels = ['A','B','C','D'];
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option';
+    btn.innerHTML = `<span class="opt-label">${labels[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i);
+    optsCont.appendChild(btn);
+  });
+  document.getElementById('q-feedback').className = 'quiz-feedback';
+  document.getElementById('q-feedback').textContent = '';
+  document.getElementById('q-next').className = 'quiz-next';
+  document.getElementById('quiz-score').textContent = `正解: ${score} / ${qIndex}`;
+  buildProgress();
+}
+
+function selectAnswer(i) {
+  const q = questions[qIndex];
+  const opts = document.querySelectorAll('.quiz-option');
+  opts.forEach(o => o.disabled = true);
+  const fb = document.getElementById('q-feedback');
+  const isCorrect = i === q.ans;
+  if (isCorrect) { score++; answered[qIndex] = true; }
+  else { answered[qIndex] = false; }
+  opts[i].classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) opts[q.ans].classList.add('correct');
+  fb.textContent = (isCorrect ? '✓ ' : '✗ ') + q.exp;
+  fb.className = 'quiz-feedback show ' + (isCorrect ? 'correct' : 'wrong');
+  document.getElementById('q-next').className = 'quiz-next show';
+  document.getElementById('quiz-score').textContent = `正解: ${score} / ${qIndex+1}`;
+  buildProgress();
+}
+
+function nextQuestion() {
+  qIndex++;
+  if (qIndex >= questions.length) {
+    showResult(); return;
+  }
+  renderQuestion();
+}
+
+function showResult() {
+  document.getElementById('quiz-body').style.display = 'none';
+  const res = document.getElementById('quiz-result');
+  res.className = 'quiz-result show';
+  document.getElementById('result-score').textContent = score;
+  const msgs = ['もう少し復習しましょう！','基本は理解できています！','よくできました！','素晴らしい！','完璧です！🎉'];
+  document.getElementById('result-msg').textContent = msgs[Math.min(score, 4)];
+  buildProgress();
+}
+
+function restartQuiz() {
+  qIndex = 0; score = 0; answered = [];
+  document.getElementById('quiz-body').style.display = 'block';
+  document.getElementById('quiz-result').className = 'quiz-result';
+  renderQuestion();
+}
+
+renderQuestion();
+</script>
+</body>
+</html>

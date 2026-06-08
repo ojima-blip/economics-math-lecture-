@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>経済数学入門B 第3回｜市場メカニズムと余剰分析</title>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+  options: { skipHtmlTags: ['script','noscript','style','textarea'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<style>
+:root {
+  --primary:#1e40af; --primary-l:#3b82f6; --primary-bg:#eff6ff;
+  --green:#15803d; --green-bg:#f0fdf4;
+  --red:#dc2626; --red-bg:#fef2f2;
+  --purple:#7c3aed;
+  --bg:#f1f5f9; --card:#fff; --text:#1e293b; --muted:#64748b; --border:#e2e8f0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+
+/* Back nav */
+.back-bar{background:#1a1a2e;padding:.55rem 1.5rem;display:flex;align-items:center;gap:1rem}
+.back-link{color:rgba(247,243,238,.7);font-family:'Space Mono',monospace;font-size:.75rem;letter-spacing:.06em;text-decoration:none;display:flex;align-items:center;gap:.4rem;transition:color .15s}
+.back-link:hover{color:#c0392b}
+.back-link::before{content:'←'}
+.back-course{color:rgba(247,243,238,.35);font-family:'Space Mono',monospace;font-size:.72rem;letter-spacing:.08em}
+
+/* Header */
+.site-header{background:linear-gradient(135deg,#1e3a5f 0%,#1e40af 100%);color:#fff;padding:2.2rem 1.5rem 1.8rem;text-align:center}
+.site-header .course{font-size:.8rem;letter-spacing:.12em;opacity:.75;text-transform:uppercase;margin-bottom:.3rem;font-family:monospace}
+.site-header h1{font-size:clamp(1.2rem,3vw,1.85rem);font-weight:700;margin-bottom:.4rem}
+.site-header .subtitle{font-size:.9rem;opacity:.7}
+/* Nav */
+.main-nav{position:sticky;top:0;z-index:100;background:#fff;border-bottom:2px solid var(--border);display:flex;overflow-x:auto;gap:0}
+.nav-btn{flex:0 0 auto;padding:.65rem 1rem;font-size:.83rem;font-weight:600;border:none;background:none;cursor:pointer;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;white-space:nowrap}
+.nav-btn:hover{color:var(--primary);background:var(--primary-bg)}
+.nav-btn.active{color:var(--primary);border-bottom-color:var(--primary)}
+/* Layout */
+.section{display:none;padding:2rem 1.2rem;max-width:900px;margin:0 auto}
+.section.active{display:block}
+.section-title{font-size:1.35rem;font-weight:700;color:var(--primary);margin-bottom:.3rem;display:flex;align-items:center;gap:.5rem}
+.section-title .badge{font-size:.75rem;background:var(--primary);color:#fff;padding:.2rem .6rem;border-radius:999px}
+.section-desc{color:var(--muted);margin-bottom:1.5rem;font-size:.93rem}
+/* Cards */
+.card{background:var(--card);border-radius:12px;padding:1.4rem;margin-bottom:1.2rem;box-shadow:0 1px 4px rgba(0,0,0,.07),0 4px 12px rgba(0,0,0,.04)}
+.card-title{font-size:1rem;font-weight:700;margin-bottom:.8rem;color:var(--text)}
+/* Definition box */
+.def-box{border-left:4px solid var(--primary);background:var(--primary-bg);border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin:1rem 0}
+.def-box .def-label{font-size:.75rem;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem}
+.def-box p{font-size:.95rem}
+/* Two-column */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+@media(max-width:680px){.two-col{grid-template-columns:1fr}}
+/* Steps */
+.step-container{margin:1rem 0}
+.step{display:none;animation:fadeIn .3s ease}
+.step.visible{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.step-box{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:.9rem 1.1rem;margin:.5rem 0}
+.step-box .step-num{font-size:.75rem;font-weight:700;color:var(--primary);margin-bottom:.3rem}
+.step-btn{display:inline-flex;align-items:center;gap:.4rem;background:var(--primary);color:#fff;border:none;border-radius:8px;padding:.55rem 1.1rem;font-size:.88rem;font-weight:600;cursor:pointer;transition:background .2s}
+.step-btn:hover{background:#1d4ed8}
+.step-btn:disabled{background:#94a3b8;cursor:not-allowed}
+.reset-btn{background:var(--muted)}
+.reset-btn:hover{background:#475569}
+/* Sliders */
+.control-group{margin:.8rem 0}
+.control-label{font-size:.85rem;font-weight:600;margin-bottom:.3rem;display:flex;justify-content:space-between}
+.control-label span{color:var(--primary);font-weight:700}
+input[type=range]{width:100%;accent-color:var(--primary);cursor:pointer}
+/* Canvas */
+.graph-wrap{position:relative;background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+canvas{display:block;max-width:100%;height:auto}
+.graph-legend{display:flex;flex-wrap:wrap;gap:.6rem;padding:.6rem .8rem;border-top:1px solid var(--border);font-size:.78rem}
+.legend-item{display:flex;align-items:center;gap:.35rem}
+.legend-dot{width:12px;height:12px;border-radius:3px}
+/* Quiz */
+.quiz-box{background:linear-gradient(135deg,#f8fafc,#f1f5f9);border:1px solid var(--border);border-radius:12px;padding:1.4rem;margin-top:1.5rem}
+.quiz-box .quiz-title{font-size:.9rem;font-weight:700;color:var(--purple);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.quiz-q{margin-bottom:1.2rem}
+.quiz-q .q-text{font-size:.93rem;font-weight:600;margin-bottom:.7rem}
+.quiz-options{display:flex;flex-direction:column;gap:.4rem}
+.opt-btn{background:#fff;border:1px solid var(--border);border-radius:8px;padding:.6rem 1rem;font-size:.88rem;text-align:left;cursor:pointer;transition:all .2s}
+.opt-btn:hover{border-color:var(--primary-l);background:var(--primary-bg)}
+.opt-btn.correct{background:#f0fdf4;border-color:var(--green);color:var(--green)}
+.opt-btn.wrong{background:var(--red-bg);border-color:var(--red);color:var(--red)}
+.quiz-feedback{margin-top:.6rem;font-size:.85rem;padding:.5rem .8rem;border-radius:6px;display:none}
+.quiz-feedback.show{display:block}
+.quiz-feedback.ok{background:var(--green-bg);color:var(--green);border-left:3px solid var(--green)}
+.quiz-feedback.ng{background:var(--red-bg);color:var(--red);border-left:3px solid var(--red)}
+/* Result */
+.result-panel{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:1rem;margin-top:.8rem}
+.result-panel .result-row{display:flex;justify-content:space-between;align-items:center;padding:.3rem 0;border-bottom:1px solid var(--border);font-size:.9rem}
+.result-panel .result-row:last-child{border-bottom:none;font-weight:700}
+.result-panel .result-val{color:var(--primary);font-weight:700}
+.hl{background:rgba(59,130,246,.15);padding:.1em .2em;border-radius:3px}
+/* Summary */
+.summary-item{display:flex;gap:.8rem;padding:.8rem 0;border-bottom:1px solid var(--border)}
+.summary-item:last-child{border-bottom:none}
+.summary-num{width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;font-size:.8rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem}
+/* Inner tabs */
+.tab-row{display:flex;gap:.5rem;margin-bottom:1rem}
+.tab-btn{padding:.45rem .9rem;border-radius:999px;border:1.5px solid var(--border);background:#fff;font-size:.83rem;font-weight:600;cursor:pointer;color:var(--muted);transition:all .2s}
+.tab-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.info-box{background:linear-gradient(135deg,#fef9c3,#fef3c7);border:1px solid #fbbf24;border-radius:8px;padding:.8rem 1rem;margin:.8rem 0;font-size:.88rem}
+.info-box::before{content:"💡 "}
+</style>
+</head>
+<body>
+
+<!-- 目次へ戻るバー -->
+<div class="back-bar">
+  <a class="back-link" href="index.html">目次に戻る</a>
+  <span class="back-course">経済数学入門B</span>
+</div>
+
+<header class="site-header">
+  <div class="course">Lecture 03</div>
+  <h1>第3回：１次関数と市場メカニズム②</h1>
+  <div class="subtitle">連立方程式・需要と供給・余剰分析</div>
+</header>
+
+<nav class="main-nav">
+  <button class="nav-btn active" onclick="showSection('s1',this)">① 連立方程式</button>
+  <button class="nav-btn" onclick="showSection('s2',this)">② 需要・供給</button>
+  <button class="nav-btn" onclick="showSection('s3',this)">③ 余剰分析</button>
+  <button class="nav-btn" onclick="showSection('s4',this)">④ 価格規制</button>
+  <button class="nav-btn" onclick="showSection('s5',this)">⑤ まとめ</button>
+</nav>
+
+<!-- ===== SECTION 1: 連立方程式 ===== -->
+<section id="s1" class="section active">
+  <div class="section-title"><span class="badge">Section 1</span>連立方程式</div>
+  <p class="section-desc">２つの条件を同時に満たす解を求める方法を学びます。</p>
+
+  <div class="card">
+    <div class="card-title">📖 問題設定</div>
+    <p style="margin-bottom:.8rem">Aさんは明日の遠足に向けてお菓子を買います。</p>
+    <ul style="padding-left:1.2rem;font-size:.93rem;line-height:2">
+      <li>飴：<strong>100円</strong>、チョコレート：<strong>200円</strong></li>
+      <li>おやつ予算：<strong>ちょうど500円</strong>を全額使う</li>
+      <li>鞄の都合：<strong>合計4個</strong>しか買えない</li>
+    </ul>
+    <p style="margin-top:.8rem">飴を $x$ 個、チョコを $y$ 個とすると…</p>
+    <div class="def-box">
+      <div class="def-label">連立方程式</div>
+      $$\begin{cases} 100x + 200y = 500 & \text{（予算制約）}\\ x + y = 4 & \text{（個数制約）}\end{cases}$$
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔢 解き方</div>
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="switchTab('m1',this)">代入法</button>
+      <button class="tab-btn" onclick="switchTab('m2',this)">加減法</button>
+    </div>
+    <div id="m1" class="tab-content active">
+      <p style="font-size:.9rem;margin-bottom:.8rem">一方の変数を他方の式に代入して解く方法です。</p>
+      <div class="step-container">
+        <div class="step visible" id="m1-s0">
+          <div class="step-box"><div class="step-num">初期状態</div>
+            <div class="step-eq">$$\begin{cases} 100x + 200y = 500 \cdots①\\ x + y = 4 \cdots② \end{cases}$$</div>
+          </div>
+        </div>
+        <div class="step" id="m1-s1">
+          <div class="step-box"><div class="step-num">ステップ１：②を $x$ について解く</div>
+            <div class="step-eq">$$x = 4 - y$$</div>
+          </div>
+        </div>
+        <div class="step" id="m1-s2">
+          <div class="step-box"><div class="step-num">ステップ２：①に代入する</div>
+            <div class="step-eq">$$100(4-y) + 200y = 500$$</div>
+          </div>
+        </div>
+        <div class="step" id="m1-s3">
+          <div class="step-box"><div class="step-num">ステップ３：展開・整理</div>
+            <div class="step-eq">$$400 - 100y + 200y = 500 \implies 100y = 100$$</div>
+          </div>
+        </div>
+        <div class="step" id="m1-s4">
+          <div class="step-box" style="border-color:var(--primary);background:var(--primary-bg)">
+            <div class="step-num">ステップ４：解を求める ✅</div>
+            <div class="step-eq">$$y = 1 \quad \therefore \quad x = 4-1 = 3$$</div>
+            <p style="margin-top:.5rem;font-size:.88rem;color:var(--green)">確認：$100\times3+200\times1=500$ ✓、$3+1=4$ ✓</p>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:.6rem;margin-top:.8rem">
+        <button class="step-btn" id="m1-next" onclick="nextStep('m1',4)">次のステップ ▶</button>
+        <button class="step-btn reset-btn" onclick="resetSteps('m1',4)">リセット</button>
+      </div>
+    </div>
+    <div id="m2" class="tab-content">
+      <p style="font-size:.9rem;margin-bottom:.8rem">一方の式を定数倍して加減し、変数を消去する方法です。</p>
+      <div class="step-container">
+        <div class="step visible" id="m2-s0">
+          <div class="step-box"><div class="step-num">初期状態</div>
+            <div class="step-eq">$$\begin{cases} 100x + 200y = 500 \cdots①\\ x + y = 4 \cdots② \end{cases}$$</div>
+          </div>
+        </div>
+        <div class="step" id="m2-s1">
+          <div class="step-box"><div class="step-num">ステップ１：②×100</div>
+            <div class="step-eq">$$100x + 100y = 400 \cdots②'$$</div>
+          </div>
+        </div>
+        <div class="step" id="m2-s2">
+          <div class="step-box"><div class="step-num">ステップ２：①－②' で $x$ を消去</div>
+            <div class="step-eq">$$(100x+200y)-(100x+100y) = 500-400 \implies 100y = 100$$</div>
+          </div>
+        </div>
+        <div class="step" id="m2-s3">
+          <div class="step-box" style="border-color:var(--primary);background:var(--primary-bg)">
+            <div class="step-num">ステップ３：解を求める ✅</div>
+            <div class="step-eq">$$y=1 \quad \therefore \quad x = 4-1 = 3$$</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:.6rem;margin-top:.8rem">
+        <button class="step-btn" id="m2-next" onclick="nextStep('m2',3)">次のステップ ▶</button>
+        <button class="step-btn reset-btn" onclick="resetSteps('m2',3)">リセット</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🎛 インタラクティブ：パラメータを変えてみよう</div>
+    <div class="two-col">
+      <div>
+        <div class="control-group">
+          <div class="control-label">予算 B = <span id="B-val">500</span>円</div>
+          <input type="range" id="B-slider" min="200" max="800" value="500" step="100" oninput="updateSimEq()">
+        </div>
+        <div class="control-group">
+          <div class="control-label">最大個数 N = <span id="N-val">4</span>個</div>
+          <input type="range" id="N-slider" min="2" max="7" value="4" step="1" oninput="updateSimEq()">
+        </div>
+        <div class="result-panel">
+          <div class="result-row"><span>飴の個数 x</span><span class="result-val" id="res-x">3</span></div>
+          <div class="result-row"><span>チョコの個数 y</span><span class="result-val" id="res-y">1</span></div>
+          <div class="result-row"><span>費用合計</span><span class="result-val" id="res-check">500円 ✓</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="graph-wrap">
+          <canvas id="sim-canvas" width="340" height="280"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="info-box">予算 $B$ と最大個数 $N$ を変えると、直線の位置が変わり交点（解）が移動します。</div>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-title">📝 確認問題</div>
+    <div class="quiz-q">
+      <div class="q-text">次の連立方程式の解は？&nbsp; $\begin{cases} x + y = 5 \\ 2x + y = 7 \end{cases}$</div>
+      <div class="quiz-options" id="q1-opts">
+        <button class="opt-btn" onclick="checkQ('q1',0,1,'式②−式①でxを消去：x=2。②に代入：y=3')">① $x=1,\; y=4$</button>
+        <button class="opt-btn" onclick="checkQ('q1',1,1,'式②−式①でxを消去：x=2。②に代入：y=3')">② $x=2,\; y=3$</button>
+        <button class="opt-btn" onclick="checkQ('q1',2,1,'式②−式①でxを消去：x=2。②に代入：y=3')">③ $x=3,\; y=2$</button>
+        <button class="opt-btn" onclick="checkQ('q1',3,1,'式②−式①でxを消去：x=2。②に代入：y=3')">④ $x=4,\; y=1$</button>
+      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 2: 需要・供給 ===== -->
+<section id="s2" class="section">
+  <div class="section-title"><span class="badge">Section 2</span>需要関数・供給関数・均衡</div>
+  <p class="section-desc">市場での価格と数量がどのように決まるかを数式で表します。</p>
+
+  <div class="two-col">
+    <div class="def-box">
+      <div class="def-label">定義：需要関数</div>
+      <p>価格 $p$ が決まると需要量 $D$ が決まる関数。<br>例：$D(p) = \alpha - \beta p$（右下がり）</p>
+    </div>
+    <div class="def-box" style="border-color:var(--green);background:var(--green-bg)">
+      <div class="def-label" style="color:var(--green)">定義：供給関数</div>
+      <p>価格 $p$ が決まると供給量 $S$ が決まる関数。<br>例：$S(p) = \gamma p$（右上がり）</p>
+    </div>
+  </div>
+  <div class="def-box" style="border-color:var(--purple);background:#f5f3ff">
+    <div class="def-label" style="color:var(--purple)">定義：均衡価格・均衡取引量</div>
+    <p>$D(p^*) = S(p^*)$ を満たす価格 $p^*$ を<strong>均衡価格</strong>、取引量 $q^* = D(p^*)$ を<strong>均衡取引量</strong>という。</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🧮 練習問題と解法ステップ</div>
+    <p style="margin-bottom:.8rem;font-size:.93rem">$D(p)=100-4p$、$S(p)=6p$ のとき、均衡価格と均衡取引量を求めよ。</p>
+    <div class="step-container">
+      <div class="step visible" id="s2-s0">
+        <div class="step-box"><div class="step-num">均衡条件を立てる</div>
+          <div class="step-eq">$$D(p^*) = S(p^*) \implies 100 - 4p^* = 6p^*$$</div>
+        </div>
+      </div>
+      <div class="step" id="s2-s1">
+        <div class="step-box"><div class="step-num">ステップ１：$p^*$ について解く</div>
+          <div class="step-eq">$$100 = 10p^* \implies p^* = 10$$</div>
+        </div>
+      </div>
+      <div class="step" id="s2-s2">
+        <div class="step-box" style="border-color:var(--purple);background:#f5f3ff"><div class="step-num">ステップ２：均衡取引量を求める ✅</div>
+          <div class="step-eq">$$q^* = D(10) = 100-40 = 60 \quad \bigl(= S(10)=60 \text{ ✓}\bigr)$$</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:.6rem;margin-top:.8rem">
+      <button class="step-btn" id="s2-next" onclick="nextStep('s2',2)">次のステップ ▶</button>
+      <button class="step-btn reset-btn" onclick="resetSteps('s2',2)">リセット</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🎛 インタラクティブ市場グラフ</div>
+    <div class="two-col">
+      <div>
+        <div class="control-group">
+          <div class="control-label">需要の切片 α = <span id="alpha-val">100</span></div>
+          <input type="range" id="alpha-sl" min="60" max="160" value="100" step="10" oninput="updateMarket()">
+        </div>
+        <div class="control-group">
+          <div class="control-label">需要の傾き β = <span id="beta-val">4</span></div>
+          <input type="range" id="beta-sl" min="2" max="8" value="4" step="1" oninput="updateMarket()">
+        </div>
+        <div class="control-group">
+          <div class="control-label">供給の傾き γ = <span id="gamma-val">6</span></div>
+          <input type="range" id="gamma-sl" min="2" max="12" value="6" step="1" oninput="updateMarket()">
+        </div>
+        <div class="result-panel">
+          <div class="result-row"><span>$D(p) =$</span><span class="result-val" id="mkt-d">100 − 4p</span></div>
+          <div class="result-row"><span>$S(p) =$</span><span class="result-val" id="mkt-s">6p</span></div>
+          <div class="result-row"><span>均衡価格 $p^*$</span><span class="result-val" id="mkt-ps">10</span></div>
+          <div class="result-row"><span>均衡取引量 $q^*$</span><span class="result-val" id="mkt-qs">60</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="graph-wrap">
+          <canvas id="mkt-canvas" width="360" height="300"></canvas>
+        </div>
+        <div class="graph-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#dc2626"></div>需要曲線</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#16a34a"></div>供給曲線</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#7c3aed;border-radius:50%"></div>均衡点</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-title">📝 確認問題</div>
+    <div class="quiz-q">
+      <div class="q-text">$D(p) = 60-2p$、$S(p) = 4p$ のとき、均衡価格 $p^*$ は？</div>
+      <div class="quiz-options" id="q2-opts">
+        <button class="opt-btn" onclick="checkQ('q2',0,1,'60−2p=4p → 60=6p → p*=10')">① $p^* = 8$</button>
+        <button class="opt-btn" onclick="checkQ('q2',1,1,'60−2p=4p → 60=6p → p*=10')">② $p^* = 10$</button>
+        <button class="opt-btn" onclick="checkQ('q2',2,1,'60−2p=4p → 60=6p → p*=10')">③ $p^* = 12$</button>
+        <button class="opt-btn" onclick="checkQ('q2',3,1,'60−2p=4p → 60=6p → p*=10')">④ $p^* = 15$</button>
+      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 3: 余剰分析 ===== -->
+<section id="s3" class="section">
+  <div class="section-title"><span class="badge">Section 3</span>余剰分析</div>
+  <p class="section-desc">市場取引から生まれる「利益」をどう測るかを学びます。</p>
+
+  <div class="two-col">
+    <div class="def-box">
+      <div class="def-label">定義：支払意思額（WTP）</div>
+      <p>買い手が財の1単位に対して支払う意思のある<strong>最大の金額</strong>。</p>
+    </div>
+    <div class="def-box" style="border-color:var(--green);background:var(--green-bg)">
+      <div class="def-label" style="color:var(--green)">定義：受入意思額（WTA）</div>
+      <p>売り手が財の1単位を売るために受け入れる<strong>最小の金額</strong>。</p>
+    </div>
+  </div>
+  <div class="two-col">
+    <div class="def-box">
+      <div class="def-label">定義：消費者余剰（CS）</div>
+      <p>支払意思額 − 実際に払った価格。<br><span class="hl">価格より上、需要曲線より下</span>の三角形面積。</p>
+      $$CS = \frac{1}{2}(p_{max} - p^*)\cdot q^*$$
+    </div>
+    <div class="def-box" style="border-color:var(--green);background:var(--green-bg)">
+      <div class="def-label" style="color:var(--green)">定義：生産者余剰（PS）</div>
+      <p>実際に受け取った価格 − 受入意思額。<br><span class="hl">価格より下、供給曲線より上</span>の三角形面積。</p>
+      $$PS = \frac{1}{2}p^* \cdot q^*$$
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🎛 余剰を可視化する</div>
+    <p style="font-size:.88rem;color:var(--muted);margin-bottom:.8rem">需要：$D(p)=1000-p$、供給：$S(p)=3p$ → 均衡：$p^*=250$、$q^*=750$</p>
+    <div class="two-col">
+      <div>
+        <div class="control-group">
+          <div class="control-label">価格 $p$ = <span id="price-val">250</span>円</div>
+          <input type="range" id="price-sl" min="50" max="900" value="250" step="10" oninput="updateSurplus()">
+        </div>
+        <div class="result-panel">
+          <div class="result-row"><span>取引量 $q$</span><span class="result-val" id="s3-q">750</span></div>
+          <div class="result-row"><span style="color:var(--primary-l)">■ 消費者余剰 CS</span><span class="result-val" id="s3-cs">281,250</span></div>
+          <div class="result-row"><span style="color:var(--green)">■ 生産者余剰 PS</span><span class="result-val" id="s3-ps">93,750</span></div>
+          <div class="result-row"><span style="color:var(--red)">■ 死荷重 DWL</span><span class="result-val" id="s3-dwl">0</span></div>
+          <div class="result-row"><span><strong>総余剰 TS</strong></span><span class="result-val" id="s3-ts">375,000</span></div>
+        </div>
+        <div class="info-box" id="s3-hint">均衡価格（250円）で総余剰が最大化されます！</div>
+      </div>
+      <div>
+        <div class="graph-wrap">
+          <canvas id="surplus-canvas" width="360" height="320"></canvas>
+        </div>
+        <div class="graph-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(59,130,246,.5)"></div>CS</div>
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(22,163,74,.5)"></div>PS</div>
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(220,38,38,.5)"></div>DWL</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📐 三角形の面積で計算する</div>
+    <div class="two-col" style="margin-top:.5rem">
+      <div style="background:var(--primary-bg);border-radius:8px;padding:1rem">
+        <p style="font-weight:700;color:var(--primary);margin-bottom:.5rem">消費者余剰</p>
+        $$CS = \frac{1}{2}(1000-250)\times 750 = 281{,}250$$
+      </div>
+      <div style="background:var(--green-bg);border-radius:8px;padding:1rem">
+        <p style="font-weight:700;color:var(--green);margin-bottom:.5rem">生産者余剰</p>
+        $$PS = \frac{1}{2}\times 250\times 750 = 93{,}750$$
+      </div>
+    </div>
+    <div style="background:#f5f3ff;border-radius:8px;padding:1rem;margin-top:.8rem">
+      <p style="font-weight:700;color:var(--purple);margin-bottom:.5rem">総余剰</p>
+      $$TS = 281{,}250 + 93{,}750 = 375{,}000$$
+    </div>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-title">📝 確認問題</div>
+    <div class="quiz-q">
+      <div class="q-text">$D(p)=1000-p$、$S(p)=3p$ の均衡での<strong>生産者余剰</strong>は？</div>
+      <div class="quiz-options" id="q3-opts">
+        <button class="opt-btn" onclick="checkQ('q3',0,2,'p*=250, q*=750。PS=(1/2)×250×750=93,750')">① ¥46,875</button>
+        <button class="opt-btn" onclick="checkQ('q3',1,2,'p*=250, q*=750。PS=(1/2)×250×750=93,750')">② ¥75,000</button>
+        <button class="opt-btn" onclick="checkQ('q3',2,2,'p*=250, q*=750。PS=(1/2)×250×750=93,750')">③ ¥93,750</button>
+        <button class="opt-btn" onclick="checkQ('q3',3,2,'p*=250, q*=750。PS=(1/2)×250×750=93,750')">④ ¥187,500</button>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 4: 価格規制 ===== -->
+<section id="s4" class="section">
+  <div class="section-title"><span class="badge">Section 4</span>価格規制と死荷重</div>
+  <p class="section-desc">政府が価格に介入するとき、市場にどのような歪みが生じるか？</p>
+
+  <div class="two-col">
+    <div class="card" style="border-top:3px solid var(--red)">
+      <div class="card-title" style="color:var(--red)">上限価格（price ceiling）</div>
+      <p style="font-size:.9rem">価格が上限を超えて取引してはいけない規制。</p>
+      <div style="margin-top:.8rem;font-size:.88rem">
+        <p>• 上限価格 ＜ 均衡価格 → <strong>超過需要</strong>が発生</p>
+        <p>• 上限価格 ≥ 均衡価格 → 均衡価格がそのまま実現</p>
+      </div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--green)">
+      <div class="card-title" style="color:var(--green)">下限価格（price floor）</div>
+      <p style="font-size:.9rem">価格が下限を下回って取引してはいけない規制。</p>
+      <div style="margin-top:.8rem;font-size:.88rem">
+        <p>• 下限価格 ＞ 均衡価格 → <strong>超過供給</strong>が発生</p>
+        <p>• 下限価格 ≤ 均衡価格 → 均衡価格がそのまま実現</p>
+      </div>
+    </div>
+  </div>
+  <div class="def-box" style="border-color:var(--red);background:var(--red-bg)">
+    <div class="def-label" style="color:var(--red)">定義：死荷重（deadweight loss）</div>
+    <p>市場の歪みによって生まれる<strong>社会的余剰の減少</strong>。死重損失とも呼ばれる。</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🎛 価格規制のシミュレーション</div>
+    <p style="font-size:.88rem;color:var(--muted);margin-bottom:1rem">$D(p)=1000-p$、$S(p)=3p$。均衡：$p^*=250$、$q^*=750$</p>
+    <div class="tab-row">
+      <button class="tab-btn active" id="reg-ceil-btn" onclick="switchRegTab('ceil')">上限価格</button>
+      <button class="tab-btn" id="reg-floor-btn" onclick="switchRegTab('floor')">下限価格</button>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="control-group">
+          <div class="control-label" id="reg-label-wrap">上限価格 = <span id="reg-val">200</span>円</div>
+          <input type="range" id="reg-sl" min="50" max="450" value="200" step="10" oninput="updateReg()">
+        </div>
+        <div class="result-panel">
+          <div class="result-row"><span id="reg-qty-label">供給量（取引量）</span><span class="result-val" id="reg-q">600</span></div>
+          <div class="result-row"><span style="color:var(--primary-l)">消費者余剰 CS</span><span class="result-val" id="reg-cs">-</span></div>
+          <div class="result-row"><span style="color:var(--green)">生産者余剰 PS</span><span class="result-val" id="reg-ps">-</span></div>
+          <div class="result-row"><span style="color:var(--red)">死荷重 DWL</span><span class="result-val" id="reg-dwl">-</span></div>
+          <div class="result-row"><span><strong>総余剰 TS</strong></span><span class="result-val" id="reg-ts">-</span></div>
+        </div>
+        <div class="info-box" id="reg-hint">上限価格200円では超過需要が発生します。</div>
+      </div>
+      <div>
+        <div class="graph-wrap">
+          <canvas id="reg-canvas" width="360" height="320"></canvas>
+        </div>
+        <div class="graph-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(59,130,246,.5)"></div>CS</div>
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(22,163,74,.5)"></div>PS</div>
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(220,38,38,.5)"></div>DWL</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div>規制価格</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-title">📝 確認問題</div>
+    <div class="quiz-q">
+      <div class="q-text">均衡価格が 250円 のとき、<strong>200円の上限価格</strong>を設けると何が起こるか？</div>
+      <div class="quiz-options" id="q4-opts">
+        <button class="opt-btn" onclick="checkQ('q4',0,1,'上限価格 < 均衡価格 → 供給量 < 需要量 → 超過需要が発生します。')">① 超過供給が発生する</button>
+        <button class="opt-btn" onclick="checkQ('q4',1,1,'上限価格 < 均衡価格 → 供給量 < 需要量 → 超過需要が発生します。')">② 超過需要が発生する</button>
+        <button class="opt-btn" onclick="checkQ('q4',2,1,'上限価格 < 均衡価格 → 供給量 < 需要量 → 超過需要が発生します。')">③ 均衡が維持される</button>
+        <button class="opt-btn" onclick="checkQ('q4',3,1,'上限価格 < 均衡価格 → 供給量 < 需要量 → 超過需要が発生します。')">④ 死荷重がゼロになる</button>
+      </div>
+      <div class="quiz-feedback" id="q4-fb"></div>
+    </div>
+    <div class="quiz-q" style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+      <div class="q-text">市場の歪みによって生じる社会的余剰の損失を何というか？</div>
+      <div class="quiz-options" id="q5-opts">
+        <button class="opt-btn" onclick="checkQ('q5',0,3,'死荷重（デッドウェイトロス / 死重損失）は市場の非効率から生まれる余剰の損失です。')">① 消費者余剰</button>
+        <button class="opt-btn" onclick="checkQ('q5',1,3,'死荷重（デッドウェイトロス / 死重損失）は市場の非効率から生まれる余剰の損失です。')">② 生産者余剰</button>
+        <button class="opt-btn" onclick="checkQ('q5',2,3,'死荷重（デッドウェイトロス / 死重損失）は市場の非効率から生まれる余剰の損失です。')">③ 超過需要</button>
+        <button class="opt-btn" onclick="checkQ('q5',3,3,'死荷重（デッドウェイトロス / 死重損失）は市場の非効率から生まれる余剰の損失です。')">④ 死荷重</button>
+      </div>
+      <div class="quiz-feedback" id="q5-fb"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 5: まとめ ===== -->
+<section id="s5" class="section">
+  <div class="section-title"><span class="badge">Section 5</span>まとめ</div>
+  <p class="section-desc">第3回の要点を整理しましょう。</p>
+  <div class="card">
+    <div class="card-title">✅ 今回のポイント</div>
+    <div class="summary-item"><div class="summary-num">1</div><div><strong>連立方程式の解き方</strong><br><span style="font-size:.9rem">代入法・加減法の2通りで解ける。需要関数と供給関数を連立すれば均衡が求まる。</span></div></div>
+    <div class="summary-item"><div class="summary-num">2</div><div><strong>消費者余剰（CS）</strong><br><span style="font-size:.9rem">支払意思額 − 価格。価格より上・需要曲線より下の三角形面積。</span></div></div>
+    <div class="summary-item"><div class="summary-num">3</div><div><strong>生産者余剰（PS）</strong><br><span style="font-size:.9rem">価格 − 受入意思額。価格より下・供給曲線より上の三角形面積。</span></div></div>
+    <div class="summary-item"><div class="summary-num">4</div><div><strong>均衡での総余剰最大化</strong><br><span style="font-size:.9rem">外部性がなければ均衡価格で総余剰が最大化される。</span></div></div>
+    <div class="summary-item"><div class="summary-num">5</div><div><strong>死荷重（DWL）</strong><br><span style="font-size:.9rem">価格規制などによる余剰の損失。均衡から乖離した三角形の面積で計算できる。</span></div></div>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-title">📝 最終確認問題</div>
+    <div class="quiz-q">
+      <div class="q-text">$D(p)=1000-p$、$S(p)=3p$ で <strong>上限価格を 100 円</strong>に設定した場合の<strong>死荷重</strong>は？</div>
+      <div class="quiz-options" id="q6-opts">
+        <button class="opt-btn" onclick="checkQ('q6',0,1,'p_c=100, q_c=S(100)=300。DWL=(1/2)×(1000-300-100)×(750-300)=(1/2)×600×450=135,000... 正確には(1/2)×(pD(300)-100)×(750-300)=(1/2)×700×450=157,500')">① ¥75,000</button>
+        <button class="opt-btn" onclick="checkQ('q6',1,1,'p_c=100, q_c=S(100)=300。DWL=(1/2)×(pD(300)−100)×(750−300)=(1/2)×700×450=157,500')">② ¥157,500</button>
+        <button class="opt-btn" onclick="checkQ('q6',2,1,'p_c=100, q_c=S(100)=300。DWL=(1/2)×(pD(300)−100)×(750−300)=(1/2)×700×450=157,500')">③ ¥187,500</button>
+        <button class="opt-btn" onclick="checkQ('q6',3,1,'p_c=100, q_c=S(100)=300。DWL=(1/2)×(pD(300)−100)×(750−300)=(1/2)×700×450=157,500')">④ ¥281,250</button>
+      </div>
+      <div class="quiz-feedback" id="q6-fb"></div>
+    </div>
+  </div>
+
+  <div class="card" style="background:linear-gradient(135deg,var(--primary-bg),#f5f3ff);text-align:center;padding:2rem;margin-top:1.5rem">
+    <div style="font-size:2rem;margin-bottom:.5rem">🎓</div>
+    <div style="font-weight:700;font-size:1.1rem;margin-bottom:.5rem">お疲れ様でした！</div>
+    <a href="index.html" style="display:inline-block;margin-top:.5rem;background:#1a1a2e;color:#f7f3ee;text-decoration:none;font-size:.85rem;padding:.55rem 1.4rem;border-radius:4px;font-family:monospace;letter-spacing:.04em">← 講義一覧に戻る</a>
+  </div>
+</section>
+
+<script>
+// ===== NAVIGATION =====
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  if (id==='s2') updateMarket();
+  if (id==='s3') updateSurplus();
+  if (id==='s4') updateReg();
+  window.scrollTo(0,0);
+}
+
+// ===== TABS =====
+function switchTab(id, btn) {
+  document.querySelectorAll('#s1 .tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('#s1 .tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+function switchRegTab(type) {
+  window._regType=type;
+  document.getElementById('reg-ceil-btn').classList.toggle('active',type==='ceil');
+  document.getElementById('reg-floor-btn').classList.toggle('active',type==='floor');
+  const sl=document.getElementById('reg-sl');
+  const lw=document.getElementById('reg-label-wrap');
+  if(type==='ceil'){sl.value=200;lw.innerHTML='上限価格 = <span id="reg-val">200</span>円';}
+  else{sl.value=300;lw.innerHTML='下限価格 = <span id="reg-val">300</span>円';}
+  updateReg();
+}
+window._regType='ceil';
+
+// ===== STEPS =====
+const SC={};
+function nextStep(p,max){
+  if(!SC[p])SC[p]=0;
+  if(SC[p]>=max)return;
+  SC[p]++;
+  const el=document.getElementById(`${p}-s${SC[p]}`);
+  if(el){el.classList.add('visible');if(typeof MathJax!=='undefined')MathJax.typesetPromise([el]);}
+  if(SC[p]>=max)document.getElementById(`${p}-next`).disabled=true;
+}
+function resetSteps(p,max){
+  SC[p]=0;
+  for(let i=1;i<=max;i++){const el=document.getElementById(`${p}-s${i}`);if(el)el.classList.remove('visible');}
+  document.getElementById(`${p}-next`).disabled=false;
+}
+
+// ===== QUIZ =====
+function checkQ(id,chosen,correct,explanation){
+  const opts=document.querySelectorAll(`#${id}-opts .opt-btn`);
+  opts.forEach((b,i)=>{b.disabled=true;if(i===correct)b.classList.add('correct');else if(i===chosen)b.classList.add('wrong');});
+  const fb=document.getElementById(`${id}-fb`);
+  fb.className=`quiz-feedback show ${chosen===correct?'ok':'ng'}`;
+  fb.textContent=(chosen===correct?'✅ 正解！':'❌ 不正解。')+'　'+explanation;
+  if(typeof MathJax!=='undefined')MathJax.typesetPromise([fb]);
+}
+
+// ===== CANVAS =====
+const GC={qMax:1000,pMax:1050,pad:{l:65,r:20,t:22,b:55}};
+function cx(q,w){return GC.pad.l+(q/GC.qMax)*(w-GC.pad.l-GC.pad.r);}
+function cy(p,h){return h-GC.pad.b-(p/GC.pMax)*(h-GC.pad.t-GC.pad.b);}
+
+function drawAxes(ctx,w,h){
+  ctx.save();
+  ctx.setLineDash([3,4]);ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1;
+  [200,400,600,800,1000].forEach(q=>{
+    ctx.beginPath();ctx.moveTo(cx(q,w),GC.pad.t);ctx.lineTo(cx(q,w),h-GC.pad.b);ctx.stroke();
+    ctx.fillStyle='#94a3b8';ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText(q,cx(q,w),h-GC.pad.b+14);
+  });
+  [200,400,600,800,1000].forEach(p=>{
+    ctx.beginPath();ctx.moveTo(GC.pad.l,cy(p,h));ctx.lineTo(w-GC.pad.r,cy(p,h));ctx.stroke();
+    ctx.fillStyle='#94a3b8';ctx.font='10px sans-serif';ctx.textAlign='right';ctx.fillText(p,GC.pad.l-5,cy(p,h)+4);
+  });
+  ctx.setLineDash([]);
+  ctx.strokeStyle='#475569';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(GC.pad.l,GC.pad.t);ctx.lineTo(GC.pad.l,h-GC.pad.b);ctx.lineTo(w-GC.pad.r,h-GC.pad.b);ctx.stroke();
+  ctx.fillStyle='#1e293b';ctx.font='bold 11px sans-serif';
+  ctx.textAlign='center';ctx.fillText('取引量 q',w/2,h-6);
+  ctx.save();ctx.translate(14,h/2);ctx.rotate(-Math.PI/2);ctx.fillText('価格 p',0,0);ctx.restore();
+  ctx.restore();
+}
+function drawSDCurves(ctx,w,h){
+  ctx.save();
+  ctx.strokeStyle='#dc2626';ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(cx(0,w),cy(1000,h));ctx.lineTo(cx(1000,w),cy(0,h));ctx.stroke();
+  ctx.fillStyle='#dc2626';ctx.font='bold 11px sans-serif';ctx.fillText('需要曲線',cx(50,w)+2,cy(940,h));
+  ctx.strokeStyle='#16a34a';ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(cx(0,w),cy(0,h));ctx.lineTo(cx(900,w),cy(300,h));ctx.stroke();
+  ctx.fillStyle='#16a34a';ctx.fillText('供給曲線',cx(700,w)+2,cy(235,h));
+  ctx.restore();
+}
+function drawEquilibrium(ctx,w,h,ps,qs){
+  ctx.save();
+  ctx.setLineDash([5,4]);ctx.strokeStyle='#7c3aed';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(GC.pad.l,cy(ps,h));ctx.lineTo(cx(qs,w),cy(ps,h));ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx(qs,w),h-GC.pad.b);ctx.lineTo(cx(qs,w),cy(ps,h));ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#7c3aed';ctx.beginPath();ctx.arc(cx(qs,w),cy(ps,h),5,0,Math.PI*2);ctx.fill();
+  ctx.font='bold 11px sans-serif';ctx.fillText(`(${qs},${ps})`,cx(qs,w)+7,cy(ps,h)-4);
+  ctx.restore();
+}
+
+// Section 1
+function updateSimEq(){
+  const B=+document.getElementById('B-slider').value;
+  const N=+document.getElementById('N-slider').value;
+  document.getElementById('B-val').textContent=B;
+  document.getElementById('N-val').textContent=N;
+  const y=(B-100*N)/100, x=N-y;
+  document.getElementById('res-x').textContent=Number.isInteger(x)?x:x.toFixed(1);
+  document.getElementById('res-y').textContent=Number.isInteger(y)?y:y.toFixed(1);
+  document.getElementById('res-check').textContent=(100*x+200*y===B)?`${B}円 ✓`:`${(100*x+200*y).toFixed(0)}円`;
+  const c=document.getElementById('sim-canvas');if(!c)return;
+  const ctx=c.getContext('2d'),w=c.width,h=c.height;
+  ctx.clearRect(0,0,w,h);
+  const pad={l:50,r:15,t:15,b:45},mx=Math.max(N+1,B/100+1);
+  const sx=(w-pad.l-pad.r)/mx,sy=(h-pad.t-pad.b)/mx;
+  const px=x2=>pad.l+x2*sx,py=y2=>h-pad.b-y2*sy;
+  ctx.strokeStyle='#94a3b8';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l,h-pad.b);ctx.lineTo(w-pad.r,h-pad.b);ctx.stroke();
+  ctx.setLineDash([3,3]);ctx.strokeStyle='#e2e8f0';
+  for(let i=1;i<=mx;i++){ctx.beginPath();ctx.moveTo(px(i),pad.t);ctx.lineTo(px(i),h-pad.b);ctx.stroke();ctx.beginPath();ctx.moveTo(pad.l,py(i));ctx.lineTo(w-pad.r,py(i));ctx.stroke();}
+  ctx.setLineDash([]);
+  ctx.fillStyle='#64748b';ctx.font='10px sans-serif';ctx.textAlign='center';
+  for(let i=0;i<=Math.floor(mx);i++){ctx.fillText(i,px(i),h-pad.b+13);}
+  ctx.textAlign='right';for(let i=0;i<=Math.floor(mx);i++){ctx.fillText(i,pad.l-5,py(i)+4);}
+  ctx.fillStyle='#1e293b';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.fillText('飴 x（個）',w/2,h-4);
+  ctx.save();ctx.translate(12,h/2);ctx.rotate(-Math.PI/2);ctx.fillText('チョコ y（個）',0,0);ctx.restore();
+  ctx.fillStyle='#cbd5e1';
+  for(let xi=0;xi<=mx;xi++)for(let yi=0;yi<=mx;yi++){ctx.beginPath();ctx.arc(px(xi),py(yi),2.5,0,Math.PI*2);ctx.fill();}
+  ctx.strokeStyle='#3b82f6';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(px(0),py(B/200));ctx.lineTo(px(B/100),py(0));ctx.stroke();
+  ctx.fillStyle='#3b82f6';ctx.font='bold 10px sans-serif';ctx.textAlign='left';ctx.fillText('予算線',px(0.1),py(B/200)-6);
+  ctx.strokeStyle='#16a34a';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(px(0),py(N));ctx.lineTo(px(N),py(0));ctx.stroke();
+  ctx.fillStyle='#16a34a';ctx.fillText('個数線',px(N*0.1),py(N*0.9)-4);
+  if(x>=0&&y>=0&&x<=mx&&y<=mx){
+    ctx.fillStyle='#7c3aed';ctx.beginPath();ctx.arc(px(x),py(y),6,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(px(x),py(y),3,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#7c3aed';ctx.font='bold 10px sans-serif';ctx.textAlign='left';
+    ctx.fillText(`(${x.toFixed(1)},${y.toFixed(1)})`,px(x)+8,py(y)-4);
+  }
+}
+
+// Section 2
+function updateMarket(){
+  const a=+document.getElementById('alpha-sl').value,b=+document.getElementById('beta-sl').value,g=+document.getElementById('gamma-sl').value;
+  document.getElementById('alpha-val').textContent=a;document.getElementById('beta-val').textContent=b;document.getElementById('gamma-val').textContent=g;
+  const ps=a/(b+g),qs=a*g/(b+g);
+  document.getElementById('mkt-d').textContent=`${a} − ${b}p`;document.getElementById('mkt-s').textContent=`${g}p`;
+  document.getElementById('mkt-ps').textContent=ps.toFixed(1);document.getElementById('mkt-qs').textContent=qs.toFixed(1);
+  const c=document.getElementById('mkt-canvas');if(!c)return;
+  const ctx=c.getContext('2d'),w=c.width,h=c.height;ctx.clearRect(0,0,w,h);
+  const pM=a/b*1.15,qM=a*1.15,pad={l:60,r:15,t:20,b:50};
+  const fx=q=>pad.l+(q/qM)*(w-pad.l-pad.r),fy=p=>h-pad.b-(p/pM)*(h-pad.t-pad.b);
+  ctx.setLineDash([3,4]);ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1;
+  for(let i=1;i<=5;i++){const q=qM*i/5,p=pM*i/5;ctx.beginPath();ctx.moveTo(fx(q),pad.t);ctx.lineTo(fx(q),h-pad.b);ctx.stroke();ctx.beginPath();ctx.moveTo(pad.l,fy(p));ctx.lineTo(w-pad.r,fy(p));ctx.stroke();ctx.fillStyle='#94a3b8';ctx.font='9px sans-serif';ctx.textAlign='center';ctx.fillText(Math.round(q),fx(q),h-pad.b+12);ctx.textAlign='right';ctx.fillText(Math.round(p),pad.l-4,fy(p)+3);}
+  ctx.setLineDash([]);ctx.strokeStyle='#475569';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l,h-pad.b);ctx.lineTo(w-pad.r,h-pad.b);ctx.stroke();
+  ctx.fillStyle='#1e293b';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.fillText('取引量 q',w/2,h-6);
+  ctx.save();ctx.translate(13,h/2);ctx.rotate(-Math.PI/2);ctx.fillText('価格 p',0,0);ctx.restore();
+  ctx.strokeStyle='#dc2626';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(fx(0),fy(a/b));ctx.lineTo(fx(a),fy(0));ctx.stroke();
+  ctx.fillStyle='#dc2626';ctx.font='11px sans-serif';ctx.textAlign='left';ctx.fillText('需要',fx(a*0.05),fy(a/b*0.88));
+  ctx.strokeStyle='#16a34a';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(fx(0),fy(0));ctx.lineTo(fx(a*1.1),fy(a*1.1/g));ctx.stroke();
+  ctx.fillStyle='#16a34a';ctx.fillText('供給',fx(a*0.75),fy(a*0.75/g)-6);
+  ctx.setLineDash([5,4]);ctx.strokeStyle='#7c3aed';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(pad.l,fy(ps));ctx.lineTo(fx(qs),fy(ps));ctx.stroke();
+  ctx.beginPath();ctx.moveTo(fx(qs),h-pad.b);ctx.lineTo(fx(qs),fy(ps));ctx.stroke();
+  ctx.setLineDash([]);ctx.fillStyle='#7c3aed';ctx.beginPath();ctx.arc(fx(qs),fy(ps),5,0,Math.PI*2);ctx.fill();
+  ctx.font='bold 10px sans-serif';ctx.fillText(`p*=${ps.toFixed(1)}`,pad.l-58,fy(ps)+4);ctx.textAlign='center';ctx.fillText(`q*=${qs.toFixed(0)}`,fx(qs),h-pad.b+25);
+}
+
+// Section 3
+function updateSurplus(){
+  const price=+document.getElementById('price-sl').value;
+  document.getElementById('price-val').textContent=price;
+  const pS=250,qS=750;
+  let cs,ps,dwl,qTraded;
+  if(price<=pS){const qt=3*price;qTraded=qt;cs=(1000-price)*qt-0.5*qt*qt;ps=0.5*price*qt;dwl=0.5*(1000-qt-price)*(qS-qt);}
+  else{const qt=1000-price;qTraded=qt;cs=0.5*(1000-price)*qt;ps=qt*price-0.5*qt*(qt/3);dwl=0.5*(price-qt/3)*(qS-qt);}
+  document.getElementById('s3-q').textContent=Math.round(qTraded).toLocaleString();
+  document.getElementById('s3-cs').textContent=Math.round(cs).toLocaleString();
+  document.getElementById('s3-ps').textContent=Math.round(ps).toLocaleString();
+  document.getElementById('s3-dwl').textContent=Math.round(Math.max(0,dwl)).toLocaleString();
+  document.getElementById('s3-ts').textContent=Math.round(cs+ps).toLocaleString();
+  const hint=document.getElementById('s3-hint');
+  if(Math.abs(price-250)<5)hint.textContent='均衡価格（250円）で総余剰が最大（375,000）です！';
+  else if(price<250)hint.textContent=`${price}円 < 均衡価格250円 → 超過需要が発生。死荷重が生まれています。`;
+  else hint.textContent=`${price}円 > 均衡価格250円 → 超過供給が発生。死荷重が生まれています。`;
+  drawSurplusGraph('surplus-canvas',price);
+}
+function drawSurplusGraph(id,price){
+  const c=document.getElementById(id);if(!c)return;
+  const ctx=c.getContext('2d'),w=c.width,h=c.height;
+  ctx.clearRect(0,0,w,h);drawAxes(ctx,w,h);
+  const pS=250,qS=750;price=Math.max(10,Math.min(990,price));
+  const qTraded=price<=pS?3*price:1000-price;
+  ctx.beginPath();ctx.moveTo(cx(0,w),cy(1000,h));ctx.lineTo(cx(qTraded,w),cy(1000-qTraded,h));ctx.lineTo(cx(qTraded,w),cy(price,h));ctx.lineTo(cx(0,w),cy(price,h));ctx.closePath();ctx.fillStyle='rgba(59,130,246,0.28)';ctx.fill();
+  ctx.beginPath();ctx.moveTo(cx(0,w),cy(0,h));ctx.lineTo(cx(qTraded,w),cy(qTraded/3,h));ctx.lineTo(cx(qTraded,w),cy(price,h));ctx.lineTo(cx(0,w),cy(price,h));ctx.closePath();ctx.fillStyle='rgba(22,163,74,0.28)';ctx.fill();
+  if(Math.abs(price-pS)>5){
+    ctx.beginPath();
+    if(price<pS){ctx.moveTo(cx(qTraded,w),cy(price,h));ctx.lineTo(cx(qTraded,w),cy(1000-qTraded,h));ctx.lineTo(cx(qS,w),cy(pS,h));}
+    else{ctx.moveTo(cx(qTraded,w),cy(price,h));ctx.lineTo(cx(qTraded,w),cy(qTraded/3,h));ctx.lineTo(cx(qS,w),cy(pS,h));}
+    ctx.closePath();ctx.fillStyle='rgba(220,38,38,0.35)';ctx.fill();
+  }
+  drawSDCurves(ctx,w,h);
+  ctx.strokeStyle='#f59e0b';ctx.lineWidth=2;ctx.setLineDash([6,4]);
+  ctx.beginPath();ctx.moveTo(cx(0,w),cy(price,h));ctx.lineTo(cx(900,w),cy(price,h));ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#b45309';ctx.font='bold 10px sans-serif';ctx.textAlign='left';ctx.fillText(`p=${price}`,cx(780,w),cy(price,h)-5);
+  drawEquilibrium(ctx,w,h,pS,qS);
+}
+
+// Section 4
+function updateReg(){
+  const t=window._regType||'ceil',ctrl=+document.getElementById('reg-sl').value;
+  document.getElementById('reg-val').textContent=ctrl;
+  const pS=250,qS=750,totTS=375000;
+  let qT,cs,ps,dwl,hint,ql;
+  if(t==='ceil'){
+    if(ctrl>=pS){qT=qS;cs=281250;ps=93750;dwl=0;hint='上限価格が均衡価格以上 → 規制は無効。均衡が実現します。';}
+    else{qT=3*ctrl;cs=(1000-ctrl)*qT-0.5*qT*qT;ps=0.5*ctrl*qT;dwl=totTS-cs-ps;hint=`上限${ctrl}円 < 均衡250円 → 超過需要（需要${Math.round(1000-ctrl)}、供給${qT}）`;}
+    ql='供給量（取引量）';
+  }else{
+    if(ctrl<=pS){qT=qS;cs=281250;ps=93750;dwl=0;hint='下限価格が均衡価格以下 → 規制は無効。均衡が実現します。';}
+    else{qT=Math.max(0,1000-ctrl);cs=0.5*(1000-ctrl)*qT;ps=ctrl*qT-0.5*qT*(qT/3);dwl=totTS-cs-ps;hint=`下限${ctrl}円 > 均衡250円 → 超過供給（需要${qT}、供給${Math.round(3*ctrl)}）`;}
+    ql='需要量（取引量）';
+  }
+  document.getElementById('reg-qty-label').textContent=ql;
+  document.getElementById('reg-q').textContent=Math.round(qT).toLocaleString();
+  document.getElementById('reg-cs').textContent=Math.round(cs).toLocaleString();
+  document.getElementById('reg-ps').textContent=Math.round(ps).toLocaleString();
+  document.getElementById('reg-dwl').textContent=Math.round(Math.max(0,dwl)).toLocaleString();
+  document.getElementById('reg-ts').textContent=Math.round(cs+ps).toLocaleString();
+  document.getElementById('reg-hint').textContent=hint;
+  const c=document.getElementById('reg-canvas');if(!c)return;
+  const ctx=c.getContext('2d'),w=c.width,h=c.height;
+  ctx.clearRect(0,0,w,h);drawAxes(ctx,w,h);
+  const effP=(t==='ceil'&&ctrl<pS)?ctrl:(t==='floor'&&ctrl>pS)?ctrl:pS;
+  ctx.beginPath();ctx.moveTo(cx(0,w),cy(1000,h));ctx.lineTo(cx(qT,w),cy(1000-qT,h));ctx.lineTo(cx(qT,w),cy(effP,h));ctx.lineTo(cx(0,w),cy(effP,h));ctx.closePath();ctx.fillStyle='rgba(59,130,246,0.28)';ctx.fill();
+  ctx.beginPath();ctx.moveTo(cx(0,w),cy(0,h));ctx.lineTo(cx(qT,w),cy(qT/3,h));ctx.lineTo(cx(qT,w),cy(effP,h));ctx.lineTo(cx(0,w),cy(effP,h));ctx.closePath();ctx.fillStyle='rgba(22,163,74,0.28)';ctx.fill();
+  if(Math.abs(effP-pS)>5&&qT<qS){
+    ctx.beginPath();
+    if(t==='ceil'){ctx.moveTo(cx(qT,w),cy(ctrl,h));ctx.lineTo(cx(qT,w),cy(1000-qT,h));ctx.lineTo(cx(qS,w),cy(pS,h));}
+    else{ctx.moveTo(cx(qT,w),cy(ctrl,h));ctx.lineTo(cx(qT,w),cy(qT/3,h));ctx.lineTo(cx(qS,w),cy(pS,h));}
+    ctx.closePath();ctx.fillStyle='rgba(220,38,38,0.38)';ctx.fill();ctx.strokeStyle='rgba(220,38,38,.8)';ctx.lineWidth=1.5;ctx.stroke();
+  }
+  drawSDCurves(ctx,w,h);
+  ctx.strokeStyle='#f59e0b';ctx.lineWidth=2.5;ctx.setLineDash([7,4]);
+  ctx.beginPath();ctx.moveTo(cx(0,w),cy(ctrl,h));ctx.lineTo(cx(950,w),cy(ctrl,h));ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#b45309';ctx.font='bold 10px sans-serif';ctx.textAlign='right';
+  ctx.fillText(`${t==='ceil'?'上限':'下限'} ${ctrl}`,cx(950,w),cy(ctrl,h)-6);
+  drawEquilibrium(ctx,w,h,pS,qS);
+}
+
+document.addEventListener('DOMContentLoaded',()=>{updateSimEq();updateMarket();updateSurplus();updateReg();});
+</script>
+</body>
+</html>
